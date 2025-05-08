@@ -16,8 +16,4 @@ urlpatterns = [
     path('contact_us/', views.contact_us, name='contact_us'),
     path('footer-content/<int:id>/', views.footer_content_view, name='footer-content'), 
     path('i18n/', include('django.conf.urls.i18n')), 
-]
-
-# Serve static files during development
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
