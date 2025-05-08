@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - Ming Group{% endblock title %}
+
+{% block content %}
+<style>
+  /* Contact Page Styling */
+  .contact-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Playfair Display', serif;
+  }
+  .contact-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    color: #2754AA;
+    margin-bottom: 20px;
+  }
+  .contact-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-group label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    font-size: 1rem;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    font-family: inherit;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: #2754AA;
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  .form-group .country-code {
+    display: flex;
+    gap: 10px;
+  }
+  .form-group .country-code input {
+    width: 80px;
+    text-align: center;
+  }
+  .submit-button {
+    padding: 12px 20px;
+    background-color: #2754AA;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: inherit;
+  }
+  .submit-button:hover {
+    background-color: #003f7f;
+  }
+  .success-message {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  .error-message {
+    text-align: center;
+    color: red;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+</style>
+
+<div class="contact-container">
+  <h2>Contact Us</h2>
+  <form method="POST" action="" id="contactForm">
+    {% csrf_token %}
+    
+    <!-- Name Field -->
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        placeholder="Your Name" 
+        required
+      >
+    </div>
+
+    <!-- Email Field -->
+    <div class="form-group">
+      <label for="email">Email Address: <span style="color: red">*</span></label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        placeholder="Your Email" 
+        required
+      >
+    </div>
+
+    <!-- Phone Number Field -->
+    <div class="form-group">
+      <label for="phone">Phone Number:</label>
+      <div class="country-code">
+        <input 
+          type="text" 
+          id="country-code" 
+          name="country_code" 
+          placeholder="+1" 
+          required
+        >
+        <input 
+          type="text" 
+          id="phone" 
+          name="phone" 
+          placeholder="123-456-7890" 
+          required
+        >
+      </div>
+    </div>
+
+    <!-- Message Field -->
+    <div class="form-group">
+      <label for="message">Message: <span style="color: red">*</span></label>
+      <textarea 
+        id="message" 
+        name="message" 
+        placeholder="Write your message here..." 
+        required
+      ></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <button 
+      type="submit" 
+      class="submit-button" 
+      id="submitBtn"
+    >Submit</button>
+  </form>
+
+  <!-- Success and Error Messages -->
+  {% if success_message %}
+    <p class="success-message">{{ success_message }}</p>
+  {% endif %}
+
+  {% if error_message %}
+    <p class="error-message">{{ error_message }}</p>
+  {% endif %}
+</div>
+
+<!-- Optional Client-Side Validation Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const emailField = document.getElementById('email');
+    const messageField = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
+
+    contactForm.addEventListener('submit', function(event) {
+      let valid = true;
+      let errorMessages = [];
+
+      // Validate email
+      if (!emailField.value.trim()) {
+        valid = false;
+        errorMessages.push("Email is required.");
+      } else {
+        // Basic email pattern check
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(emailField.value.trim())) {
+          valid = false;
+          errorMessages.push("Enter a valid email address.");
+        }
+      }
+
+      // Validate message
+      if (!messageField.value.trim()) {
+        valid = false;
+        errorMessages.push("Message is required.");
+      }
+
+      // If form is not valid, prevent submission and show errors
+      if (!valid) {
+        event.preventDefault();
+        alert("Please fix the following errors:\n\n" + errorMessages.join("\n"));
+      }
+    });
+  });
+</script>
+{% endblock content %}

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gallery - Ming Group{% endblock title %}
+
+{% block content %}
+  <style>
+    /* General Styling for the Gallery Page */
+    .company-section {
+      margin: 40px auto;
+      max-width: 1200px;
+    }
+    .company-title {
+      font-size: 1.8rem;
+      color: #2754AA;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .store-title {
+      font-size: 1.4rem;
+      color: #333;
+      margin: 20px 0 10px;
+      text-align: center;
+    }
+
+    .image-card-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 15px;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    .image-card {
+      flex: 0 0 auto;
+      width: 200px; /* Fixed card width */
+      height: 150px; /* Fixed card height */
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .image-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Ensures images fit into the dimensions while maintaining aspect ratio */
+      display: block;
+    }
+    .image-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Scrollbar Customization */
+    .image-card-container::-webkit-scrollbar {
+      height: 10px;
+    }
+    .image-card-container::-webkit-scrollbar-thumb {
+      background-color: #ccc;
+      border-radius: 10px;
+    }
+    .image-card-container::-webkit-scrollbar-track {
+      background-color: #f5f5f5;
+    }
+  </style>
+
+  <main>
+    {% for group in groups %}
+      {% for company in group.companies.all %}
+        <section class="company-section">
+          <!-- Display Company Title -->
+          <h2 class="company-title">{{ company.title }}</h2>
+
+          {% for store in company.stores.all %}
+            <!-- Display Store Title -->
+            {% if store.store_name and store.store_name != 'None' %}
+            <h3 class="store-title">{{ store.store_name }}</h3>
+            {% endif %}
+
+            <!-- Horizontal Scrollable Image Container -->
+            <div class="image-card-container">
+              {% for image_path in store.gallery_images.all %}
+                {% for image in image_path.images %}
+                  <div class="image-card">
+                    <img src="{% static image %}" alt="{{ store.store_name }} Image {{ forloop.counter }}" />
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </section>
+      {% endfor %}
+    {% endfor %}
+  </main>
+{% endblock content %}

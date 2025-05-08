@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - Ming Group{% endblock title %}
+
+{% block content %}
+  <style>
+    /* About Us Page Specific CSS */
+    .image-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px; /* Padding from both sides */
+      margin: 20px 0;
+      gap: 10px; /* Spacing between images */
+    }
+    .image-row img {
+      width: 32%; /* Adjust width to divide the screen equally */
+      height: auto;
+      border-radius: 6px; /* Optional: Adds rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+      transition: transform 0.3s, box-shadow 0.3s; /* Animation for hover effects */
+    }
+    .image-row img:hover {
+      transform: scale(1.05); /* Slight zoom on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    }
+    .Y9pbG {
+      margin: 40px auto;
+      max-width: 800px;
+      line-height: 1.6;
+      color: #333;
+      font-family: 'Mukta Sans', sans-serif;
+    }
+    .sTtmz {
+      margin: 20px 0;
+    }
+    .css-1220ufo {
+      background-color: #f5f7fa;
+      padding: 20px;
+      border-radius: 6px;
+    }
+    .hcw3J h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: #2754AA;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 20px;
+    }
+    .hcw3J p {
+      margin-bottom: 1.5em;
+      text-align: justify;
+    }
+    .hcw3J strong {
+      font-weight: bold;
+    }
+  </style>
+
+  <main>
+    <!-- Horizontal Image Row -->
+    <section class="image-row">
+      <img src="{% static 'images/about_us_image_1.webp' %}" alt="About Us Image 1" />
+      <img src="{% static 'images/about_us_image_2.webp' %}" alt="About Us Image 2" />
+      <img src="{% static 'images/about_us_image_3.webp' %}" alt="About Us Image 3" />
+    </section>
+
+    <!-- Our Story Section -->
+    <section class="Y9pbG">
+      <div class="sTtmz" data-testid="static-text-element">
+        <div class="css-1220ufo hcw3J">
+          <h2 class="our-story-title">Our Story</h2>
+          {{ main_company.our_story|safe }}
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

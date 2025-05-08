@@ -1,0 +1,281 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Ming Group{% endblock title %}</title>
+  
+  <!-- AOS CSS included globally for use on pages that need it -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  
+  <style>
+    /* Common Reset & Header Styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Mukta Sans', sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(to right, #fff, #e6f0ff);
+      color: #333;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      transition: background-color 0.3s, padding 0.3s;
+      width: 100%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 100;
+    }
+    header.sticky {
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(to right, #FFC8DD, #BDE0FE);
+      padding: 15px 20px; /* keep or adjust your spacing */
+      transition: background-color 0.3s; /* smooth transition */
+    }
+    header.sticky .button {
+      background-color: #000;
+    }
+
+    /* Original Nav for Desktop */
+    nav ul {
+      list-style: none;
+      display: flex; /* Horizontal layout */
+    }
+    nav li {
+      margin-right: 30px;
+      position: relative;
+    }
+    nav li a {
+      color: #333;
+      text-decoration: none;
+      padding: 5px 0;
+      display: inline-block;
+      transition: color 0.3s;
+    }
+    nav li a:hover {
+      color: #2754AA;
+    }
+    nav li.active a {
+      border-bottom: 2px solid #2754AA;
+    }
+
+    /* Centered Title */
+    .header-title {
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute; 
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+    }
+
+    /* Desktop "Work with Us!" Button */
+    .button {
+      padding: 10px 25px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    /* Footer Links */
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      gap: 30px; /* Adjust spacing between links */
+    }
+    .footer-link {
+      text-decoration: none;
+      color: #2754AA;
+      font-size: 16px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    .footer-link:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+
+    /* =============== MOBILE DRAWER =============== */
+    /* Hamburger icon hidden by default; displayed only in mobile via media query */
+    .hamburger-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.8rem; /* hamburger icon size */
+      cursor: pointer;
+      color: #333;
+    }
+
+    /* Drawer menu (off-screen left by default) */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -250px; /* Slide off-screen to the left */
+      width: 250px;
+      height: 100%;
+      background-color: #fff;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      transition: left 0.3s ease;
+      padding: 80px 20px; /* some top padding so it’s below header area */
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      z-index: 999; /* above header */
+    }
+    .drawer.show {
+      left: 0; /* Slide in */
+    }
+    .drawer ul {
+      list-style: none;
+    }
+    .drawer li {
+      margin: 10px 0;
+    }
+    .drawer li a {
+      display: block;
+      padding: 5px 0;
+      color: #333;
+      text-decoration: none;
+      font-size: 18px;
+    }
+    .drawer li a:hover {
+      color: #2754AA;
+    }
+
+    /* ========== MEDIA QUERY for MOBILE ========== */
+    @media (max-width: 768px) {
+      /* Hide original desktop nav & button */
+      nav ul {
+        display: none;
+      }
+      .button {
+        display: none; /* Hide the big desktop button */
+      }
+      /* Show hamburger icon */
+      .hamburger-btn {
+        display: inline-block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Global Header -->
+  <header id="header">
+    <!-- Left Side: Mobile Hamburger (hidden on desktop) -->
+    <button class="hamburger-btn" id="hamburgerBtn">&#9776;</button>
+    
+    <!-- Original Nav (Desktop) -->
+    <nav>
+      <ul>
+        <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+          <a href="{% url 'home' %}">Home</a>
+        </li>
+        <li class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">
+          <a href="{% url 'about_us' %}">About Us</a>
+        </li>
+        <li class="{% if request.resolver_match.url_name == 'Career' %}active{% endif %}">
+          <a href="{% url 'career' %}">Career</a>
+        </li>
+        <li class="{% if request.resolver_match.url_name == 'Gallery' %}active{% endif %}">
+          <a href="{% url 'gallery' %}">Gallery</a>
+        </li>
+        <li class="{% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}">
+          <a href="{% url 'contact_us' %}">Contact</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Center Title -->
+    <div class="header-title">Ming Group</div>
+
+    <!-- Right Side: "Work with Us!" Button (Desktop Only) -->
+    <button class="button" onclick="location.href='/career/'">Work with Us!</button>
+  </header>
+
+  <!-- Drawer Menu (Mobile) -->
+  <div class="drawer" id="drawerMenu">
+    <ul>
+      <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        <a href="{% url 'home' %}">Home</a>
+      </li>
+      <li class="{% if request.resolver_match.url_name == 'about_us' %}active{% endif %}">
+        <a href="{% url 'about_us' %}">About Us</a>
+      </li>
+      <li class="{% if request.resolver_match.url_name == 'career' %}active{% endif %}">
+        <a href="{% url 'career' %}">Career</a>
+      </li>
+      <li class="{% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">
+        <a href="{% url 'gallery' %}">Gallery</a>
+      </li>
+      <li class="{% if request.resolver_match.url_name == 'contact_us' %}active{% endif %}">
+        <a href="{% url 'contact_us' %}">Contact</a>
+      </li>
+      <!-- If you want "Work with Us!" in the drawer too, add it here. -->
+      <!--
+      <li>
+        <a href="{% url 'career' %}" style="color:#007bff; font-weight:bold;">
+          Work with Us!
+        </a>
+      </li>
+      -->
+    </ul>
+  </div>
+
+  <!-- Page-specific content will be injected here -->
+  {% block content %}{% endblock content %}
+
+  <div class="footer-links">
+    {% for content in footer_contents %}
+      <a href="{% url 'footer-content' content.id %}" class="footer-link">{{ content.title }}</a>
+    {% endfor %}
+  </div>
+
+  <!-- Common Scripts -->
+  <script>
+    // Sticky Header Logic
+    const header = document.getElementById('header');
+    window.onscroll = function() {
+      if (window.scrollY > 0) {
+        header.classList.add('sticky');
+      } else {
+        header.classList.remove('sticky');
+      }
+    };
+
+    // Mobile Drawer Logic
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const drawerMenu = document.getElementById('drawerMenu');
+
+    hamburgerBtn.addEventListener('click', function() {
+      drawerMenu.classList.toggle('show');
+    });
+
+    // Close the drawer if screen is resized above 768px
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768 && drawerMenu.classList.contains('show')) {
+        drawerMenu.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

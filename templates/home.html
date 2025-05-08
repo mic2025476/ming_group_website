@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Ming Group{% endblock title %}
+
+{% block content %}
+<!-- Swiper CSS for the slider -->
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+<style>
+  .main-content {
+    text-align: center;
+    margin: 20px 20px 60px;
+    padding-top: 10px;
+  }
+  .main-content .title {
+    font-size: 48px;
+    color: #2754AA;
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+  }
+  .main-content .subtitle {
+    font-size: 20px;
+    color: #555;
+    margin: 10px 0 20px;
+  }
+  .main-content img {
+    width: 40%;
+    padding-top: 10px;
+    transition: transform 0.5s;
+  }
+  .main-content img:hover {
+    transform: scale(1.05);
+  }
+  .intro-text {
+    font-size: 20px;
+    max-width: 800px;
+    margin: 0 auto 40px;
+    text-align: left;
+    line-height: 1.6;
+  }
+  .ming-family-title {
+    font-size: 48px;
+    color: #2754AA;
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    max-width: 80%;
+    margin: 50px auto 0;
+    position: relative;
+  }
+  .ming-family-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #2754AA;
+    margin: 10px auto 0;
+    border-radius: 2px;
+  }
+  .company-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin: 40px auto;
+    max-width: 1200px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .company-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  .company-card.reverse-layout {
+    flex-direction: row-reverse;
+  }
+  .left-col {
+    width: 40%;
+    position: relative;
+    overflow: hidden;
+  }
+  .swiper {
+    width: 100%;
+    position: relative;
+    height: 350px;
+    border-radius: 0;
+  }
+  .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .company-details {
+    width: 60%;
+    padding: 30px;
+  }
+  .company-title {
+    font-size: 28px;
+    color: #2754AA;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 10px;
+  }
+  .company-subtitle {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  .store-info {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .store-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2754AA;
+    margin-bottom: 8px;
+  }
+  .store-info span {
+    font-weight: bold;
+    display: inline-block;
+    width: 140px;
+  }
+  .store-info a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .store-info a:hover {
+    text-decoration: underline;
+  }
+  @media(max-width: 768px) {
+    .company-card,
+    .company-card.reverse-layout {
+      flex-direction: column;
+    }
+    .left-col {
+      width: 100%;
+    }
+    .swiper {
+      height: 250px;
+    }
+    .company-details {
+      width: 100%;
+      padding: 20px;
+    }
+  }
+  /* General Styling */
+  .homepage-content-slider {
+    text-align: center;
+    margin: 40px auto;
+    max-width: 800px; /* Center content with limited width */
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Swiper Styles */
+  .swiper {
+    overflow: hidden;
+  }
+
+  .swiper-wrapper {
+    display: flex;
+  }
+
+  .swiper-slide {
+    flex: 0 0 auto;
+    width: 300px; /* Card width */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .content-box {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+  }
+
+  .content-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .content-title {
+    font-size: 1.5rem;
+    color: #2754AA;
+    margin-bottom: 10px;
+  }
+
+  .content-description {
+  font-size: 1rem;
+  color: #555;
+  width: 60%; /* Adjust this value to set the desired fixed width */
+  margin: 0 auto; /* Centers the description horizontally within the card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80%; /* Ensures it fills the available vertical space */
+  text-align: center; /* Centers the text horizontally */
+  line-height: 1.5; /* Adjust line-height for better readability */
+}
+
+  /* Swiper Navigation */
+  .swiper-button-next,
+.swiper-button-prev {
+  color: #2754AA;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+
+  /* Swiper Pagination */
+  .swiper-pagination {
+    bottom: 10px;
+  }
+
+  .swiper-pagination-bullet {
+    background: #2754AA;
+    opacity: 0.7;
+  }
+
+  .swiper-pagination-bullet-active {
+    background: #2754AA;
+    opacity: 1;
+  }
+</style>
+
+<div class="main-content" data-aos="fade-up">
+  <p class="subtitle">{{ main_company.tagline }}</p>
+  <img src="{% static main_company.logo_path %}" alt="{{ main_company.title }} Logo" data-aos="zoom-in">
+</div>
+
+<div class="intro-text" data-aos="fade-up" data-aos-delay="200">
+  <p>{{ main_company.description }}</p>
+</div>
+
+{% for group in groups %}
+  <div class="ming-family-title" data-aos="fade-up">{{ group.name }}</div>
+  
+  {% for company in group.companies.all %}
+    <div class="company-card {% if forloop.counter|divisibleby:2 %}reverse-layout{% endif %}"
+         data-aos="fade-up"
+         data-aos-delay="{{ forloop.counter0|add:'100' }}">
+      <div class="left-col">
+        <!-- Slider starts here -->
+        <div class="swiper swiper-company-{{ company.id }}">
+          <div class="swiper-wrapper">
+            <!-- First slide is company logo -->
+            <div class="swiper-slide">
+              <img src="{% static company.logo_path %}" alt="Company Logo">
+            </div>
+            <!-- Subsequent slides: store gallery images -->
+            {% for store in company.stores.all %}
+              {% for gallery in store.gallery_images.all %}
+                {% for image_path in gallery.images %}
+                  <div class="swiper-slide">
+                    <img src="{% static image_path %}" alt="{{ store.store_name }} Image">
+                  </div>
+                {% endfor %}
+              {% endfor %}
+            {% endfor %}
+          </div>
+          <!-- Optional navigation & pagination -->
+          <div class="swiper-button-next swiper-button-next-{{ company.id }}"></div>
+          <div class="swiper-button-prev swiper-button-prev-{{ company.id }}"></div>
+          <div class="swiper-pagination swiper-pagination-{{ company.id }}"></div>
+        </div>
+      </div>
+
+      <div class="company-details">
+        <div class="company-title">{{ company.title }}</div>
+        <div class="company-subtitle">{{ company.tagline }}</div>
+        {% for store in company.stores.all %}
+          <div class="store-info">
+            {% if store.store_name and store.store_name != 'None' %}
+            <h3 class="store-title">{{ store.store_name }}</h3>
+            {% endif %}
+            <p>
+              <span>Address:</span>
+              <a href="https://www.google.com/maps/dir/?api=1&origin=current+location&destination={{ store.address|urlencode }}"
+                 target="_blank">
+                {{ store.address }}
+              </a>
+            </p>
+            <p><span>Opening Hours:</span> {{ store.opening_hours }}</p>
+            <p>
+              <span>Email:</span>
+              <a href="mailto:{{ store.email }}" target="_blank">
+                {{ store.email|default:"N/A" }}
+              </a>
+            </p>
+            <p>
+              <span>Phone:</span>
+              <a href="tel:{{ store.phone }}" target="_blank">
+                {{ store.phone|default:"N/A" }}
+              </a>
+            </p>
+            <p><span>Fax:</span> {{ store.fax|default:"N/A" }}</p>
+            <p><span>Capacity:</span> {{ store.capacity|default:"N/A" }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+{% endfor %}
+<div class="homepage-content-slider" data-aos="fade-up">
+    <div class="swiper homepage-content-swiper">
+      <div class="swiper-wrapper">
+        {% for content in sections %}
+          <div class="swiper-slide">
+            <div class="content-box">
+              <h3 class="content-title">{{ content.title }}</h3>
+              <p class="content-description">{{ content.content }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- Navigation and Pagination -->
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-pagination"></div>
+    </div>
+  </div>
+<!-- Swiper JS -->
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<!-- AOS JS for animations (optional) -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true,
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const allSwipers = document.querySelectorAll('[class*="swiper-company-"]');
+    allSwipers.forEach(swiperEl => {
+      const classList = Array.from(swiperEl.classList);
+      const companyClass = classList.find(cls => cls.startsWith('swiper-company-'));
+      const companyId = companyClass.split('-')[2];
+
+      new Swiper('.swiper-company-' + companyId, {
+        slidesPerView: 1,
+        spaceBetween: 10,
+        loop: true,
+        autoplay: {
+          delay: 2000,
+          disableOnInteraction: true,
+        },
+        navigation: {
+          nextEl: '.swiper-button-next-' + companyId,
+          prevEl: '.swiper-button-prev-' + companyId,
+        },
+        pagination: {
+          el: '.swiper-pagination-' + companyId,
+          clickable: true,
+        },
+      });
+    });
+    new Swiper('.homepage-content-swiper', {
+      slidesPerView: 1,
+      spaceBetween: 10,
+      loop: true,
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+    });
+  });
+</script>
+{% endblock content %}

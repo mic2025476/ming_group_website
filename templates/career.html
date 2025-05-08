@@ -1,0 +1,33 @@
+<!-- career.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Career - Ming Group{% endblock title %}
+
+{% block content %}
+
+  <!-- Embed the job post using an iframe -->
+  <iframe
+    id="personio-job-iframe"
+    src="{{ job_url }}"
+    width="100%"
+    height="1000px"
+    style="border: none;"
+  >
+  </iframe>
+
+  <script>
+    /*
+      Dynamically adjust iframe height based on content.
+      This works if the job post page sends postMessage events to set the height.
+    */
+    window.addEventListener('message', function(e) {
+      const iframe = document.getElementById('personio-job-iframe');
+      const eventName = e.data[0];
+      const data = e.data[1];
+      if (eventName === 'setHeight') {
+        iframe.style.height = data + 'px';
+      }
+    }, false);
+  </script>
+{% endblock content %}
