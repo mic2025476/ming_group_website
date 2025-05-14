@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-y5c+9i5t=23$*uyj45r1=g0zb=%88zy#w25##(rzz7bc55fg1e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["ming-gruppe.de", "www.ming-gruppe.de", "34.192.49.243"]
+ALLOWED_HOSTS = ["ming-group.de", "www.ming-group.de", "34.192.49.243"]
 
 
 # Application definition
