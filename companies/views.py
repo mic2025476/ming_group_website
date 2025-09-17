@@ -2,6 +2,9 @@ import os
 from django.shortcuts import get_object_or_404, render
 from .models import FooterContentModel, HomePageContentModel, MainCompanyModel, GroupModel, StoreAddressModel
 
+def maintenance_view(request):
+    return render(request, 'maintenance.html')
+
 def home_view(request):
     # Fetch main company details
     main_company = MainCompanyModel.objects.filter(is_active=True, is_deleted=False).first()
