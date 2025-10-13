@@ -1,4 +1,4 @@
-Step‑by‑Step Guide to Clone, Configure and Run the Django “ming_group_website” Project
+Step‑by‑Step Guide to Clone, Configure and Run the Django “ming_group_website” Project updated
 
 1. What Is This Repository?
 - Framework: Django (a Python toolkit for building websites)
