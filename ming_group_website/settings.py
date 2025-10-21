@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-y5c+9i5t=23$*uyj45r1=g0zb=%88zy#w25##(rzz7bc55fg1e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["ming-group.de", "www.ming-group.de", "13.60.63.92","127.0.0.1"]
+ALLOWED_HOSTS = ["ming-group.de", "www.ming-group.de", "13.60.63.92","127.0.0.1",'098163d95bc4.ngrok-free.app']
 
 
 # Application definition
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # Add WhiteNoise for efficient static file serving
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -133,6 +134,22 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # Assuming you have a `static/` folder at the project root
 ]
+
+# WhiteNoise settings for efficient static file serving with compression
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Don't compress already-compressed files (PDFs, WebP)
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['pdf', 'gz', 'br', 'webp']
+
+# Custom MIME types
+WHITENOISE_MIMETYPES = {
+    '.pdf': 'application/pdf',
+    '.webp': 'image/webp',
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

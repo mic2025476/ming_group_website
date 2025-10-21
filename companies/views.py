@@ -55,3 +55,9 @@ def footer_content_view(request, id):
     """
     footer_content = get_object_or_404(FooterContentModel, id=id, is_active=True)
     return render(request, 'footer_content.html', {'footer_content': footer_content})
+
+def menu_view(request):
+    """
+    View to display the Ming restaurant menu (optimized PDF viewer).
+    """
+    return render(request, 'menu_viewer.html')

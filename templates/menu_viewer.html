@@ -1,0 +1,605 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>M1 Menu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        .menu-viewer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .page-counter {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .viewer-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-image-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 180ms ease;  /* quick, feels instant */
+            pointer-events: none;
+        }
+
+        .page-image-wrapper.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .page-image {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-button:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-button.prev {
+            left: 15px;
+        }
+
+        .nav-button.next {
+            right: 15px;
+        }
+
+        .nav-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+        }
+
+        .swipe-hint {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            animation: fadeOut 3s forwards;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes fadeOut {
+            0%, 50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .nav-button {
+                width: 44px;
+                height: 44px;
+            }
+
+            .nav-button.prev {
+                left: 10px;
+            }
+
+            .nav-button.next {
+                right: 10px;
+            }
+        }
+
+        @media (orientation: landscape) and (max-width: 896px) {
+            .header {
+                padding: 10px 15px;
+            }
+        }
+/* Allow handling gestures inside each page */
+.page-image-wrapper {
+    touch-action: none;       /* enables Pointer Events pinch/pan */
+    overflow: hidden;         /* hide edges while panning when zoomed */
+    background: #000;
+    will-change: opacity; 
+}
+
+.page-image {
+    will-change: transform;   /* smoother transforms */
+    transform-origin: center center;
+  /* Prevent subpixel shimmer during fade */
+  image-rendering: -webkit-optimize-contrast;
+  backface-visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-image-wrapper { transition: none; }
+}
+
+    </style>
+</head>
+<body>
+    <div class="menu-viewer">
+        <!-- Header -->
+        <div class="header">
+            <h1>M1 Menu</h1>
+            <div class="page-counter">
+                <span id="current-page">1</span> / <span id="total-pages">33</span>
+            </div>
+        </div>
+
+        <!-- Viewer Container -->
+        <div class="viewer-container" id="viewer">
+            <div class="loading" id="loading">Loading menu...</div>
+
+            <!-- Pages will be dynamically loaded here -->
+
+            <!-- Previous Button -->
+            <button class="nav-button prev" id="prev-btn" aria-label="Previous page">
+                <svg viewBox="0 0 24 24">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+            </button>
+
+            <!-- Next Button -->
+            <button class="nav-button next" id="next-btn" aria-label="Next page">
+                <svg viewBox="0 0 24 24">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                </svg>
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+        const pageDomCache = new Map(); // pageNum -> wrapper
+        const MAX_DOM_PAGES = 3;        // keep prev/current/next in DOM
+        const TOTAL_PAGES = 33;
+        const BASE_PATH = '{% static "m1/pages" %}';
+
+        let currentPage = 1;
+        let isTransitioning = false;
+
+        const viewer = document.getElementById('viewer');
+        const loading = document.getElementById('loading');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentPageEl = document.getElementById('current-page');
+
+        // Preload ALL images upfront for instant viewing
+        const imageCache = {};
+        let imagesLoaded = 0;
+async function buildPageWrapper(pageNum) {
+  if (pageDomCache.has(pageNum)) return pageDomCache.get(pageNum);
+
+  const wrapper = createPageElement(pageNum);
+  const img = wrapper.querySelector('.page-image');
+
+  try {
+    if (img.decode) await img.decode();
+    else await new Promise(r => img.complete ? r() : img.addEventListener('load', r, { once: true }));
+  } catch (_) { /* ignore */ }
+
+  // ❌ REMOVE this; it blocks the fade-in:
+  // wrapper.style.opacity = '0';
+
+  // ✅ Attach pinch-zoom once per wrapper
+  if (!wrapper._pzReady) {
+    enablePinchZoom(wrapper);
+    wrapper._pzReady = true;
+  }
+
+  pageDomCache.set(pageNum, wrapper);
+  return wrapper;
+}
+
+function mountPoolAround(pageNum) {
+  const wanted = new Set([pageNum - 1, pageNum, pageNum + 1].filter(n => n >= 1 && n <= TOTAL_PAGES));
+
+  // mount wanted
+  wanted.forEach(n => {
+    const el = pageDomCache.get(n);
+    if (el && !viewer.contains(el)) viewer.appendChild(el);
+  });
+
+  // unmount extras to avoid DOM bloat
+  [...pageDomCache.keys()].forEach(n => {
+    const el = pageDomCache.get(n);
+    if (!wanted.has(n) && el && viewer.contains(el)) {
+      viewer.removeChild(el);
+    }
+  });
+}
+
+        function preloadImage(pageNum) {
+            const pageId = String(pageNum).padStart(3, '0');
+            const img1x = new Image();
+            const img2x = new Image();
+
+            img1x.onload = img2x.onload = () => {
+                imagesLoaded++;
+                if (loading && imagesLoaded === TOTAL_PAGES * 2) {
+                    loading.textContent = 'Ready!';
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                    }, 500);
+                } else if (loading) {
+                    loading.textContent = `Loading menu... ${Math.floor((imagesLoaded / (TOTAL_PAGES * 2)) * 100)}%`;
+                }
+            };
+
+            img1x.src = `${BASE_PATH}/page-${pageId}-1x.webp`;
+            img2x.src = `${BASE_PATH}/page-${pageId}-2x.webp`;
+
+            imageCache[pageNum] = { img1x, img2x };
+        }
+
+        // Preload ALL pages upfront
+        for (let i = 1; i <= TOTAL_PAGES; i++) {
+            preloadImage(i);
+        }
+
+        function createPageElement(pageNum) {
+            const pageId = String(pageNum).padStart(3, '0');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'page-image-wrapper';
+            wrapper.dataset.page = pageNum;
+
+            const img = document.createElement('img');
+            img.className = 'page-image';
+            img.src = `${BASE_PATH}/page-${pageId}-1x.webp`;
+            img.srcset = `${BASE_PATH}/page-${pageId}-1x.webp 1x, ${BASE_PATH}/page-${pageId}-2x.webp 2x`;
+            img.alt = `Menu Page ${pageNum}`;
+            img.loading = pageNum <= 2 ? 'eager' : 'lazy';
+            img.draggable = false;
+
+            wrapper.appendChild(img);
+            return wrapper;
+        }
+function enablePinchZoom(wrapper) {
+    const img = wrapper.querySelector('.page-image');
+
+    // State
+    let scale = 1, minScale = 1, maxScale = 4;
+    let startScale = 1;
+    let translateX = 0, translateY = 0;
+    let startTranslateX = 0, startTranslateY = 0;
+
+    // Multi-pointer tracking
+    const pointers = new Map();
+
+    // Helpers
+    const setTransform = () => {
+        img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+        wrapper._scale = scale;  
+    };
+    wrapper._scale = 1;
+
+    const getDistance = (p1, p2) => Math.hypot(p2.x - p1.x, p2.y - p1.y);
+    const getCenter = (p1, p2) => ({ x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 });
+
+    // Constrain panning so you can't drag the image completely away
+    const clampPan = () => {
+        const rect = wrapper.getBoundingClientRect();
+        const imgRect = img.getBoundingClientRect();
+
+        // Visible half-size of wrapper
+        const halfW = rect.width / 2;
+        const halfH = rect.height / 2;
+
+        // Scaled image half-size
+        const imgHalfW = (img.naturalWidth * scale) / 2 * (rect.height / img.naturalHeight > rect.width / img.naturalWidth ? rect.width / img.naturalWidth : rect.height / img.naturalHeight);
+        const imgHalfH = (img.naturalHeight * scale) / 2 * (rect.height / img.naturalHeight > rect.width / img.naturalWidth ? rect.width / img.naturalWidth : rect.height / img.naturalHeight);
+
+        // When the image is smaller than the wrapper, keep it centered
+        const maxX = Math.max(0, imgHalfW - halfW);
+        const maxY = Math.max(0, imgHalfH - halfH);
+
+        translateX = Math.min(maxX, Math.max(-maxX, translateX));
+        translateY = Math.min(maxY, Math.max(-maxY, translateY));
+    };
+
+    // Pointer Events
+    wrapper.onpointerdown = (e) => {
+        wrapper.setPointerCapture(e.pointerId);
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // Cache starting transforms for the gesture
+        startScale = scale;
+        startTranslateX = translateX;
+        startTranslateY = translateY;
+    };
+
+    wrapper.onpointermove = (e) => {
+        if (!pointers.has(e.pointerId)) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        const pts = [...pointers.values()];
+
+        if (pts.length === 2) {
+            // Pinch zoom
+            const startPts = pts.map(p => p); // current snapshots
+            // We also need the initial positions; simplest approach: store first frame of two-pointer gesture
+            if (!wrapper._pinchStart) {
+                wrapper._pinchStart = {
+                    a: startPts[0],
+                    b: startPts[1],
+                    center: getCenter(startPts[0], startPts[1]),
+                    distance: getDistance(startPts[0], startPts[1]),
+                    scale: scale,
+                    tx: translateX,
+                    ty: translateY
+                };
+                return;
+            }
+
+            const s = wrapper._pinchStart;
+            const newCenter = getCenter(startPts[0], startPts[1]);
+            const newDistance = getDistance(startPts[0], startPts[1]);
+
+            // Scale relative to start of pinch
+            const factor = newDistance / (s.distance || 1);
+            let nextScale = Math.max(minScale, Math.min(maxScale, s.scale * factor));
+
+            // Keep zoom focused around the pinch center by adjusting translation
+            // Compute how much the center moved and compensate.
+            scale = nextScale;
+
+            // Pan by the movement of the center while also compensating for scale change
+            translateX = s.tx + (newCenter.x - s.center.x);
+            translateY = s.ty + (newCenter.y - s.center.y);
+
+            clampPan();
+            setTransform();
+        } else if (pts.length === 1) {
+            // One finger pan when zoomed in
+            if (scale > 1) {
+                const p = pts[0];
+                if (!wrapper._dragStart) {
+                    wrapper._dragStart = { x: p.x, y: p.y, tx: translateX, ty: translateY };
+                    return;
+                }
+                const d = wrapper._dragStart;
+                translateX = d.tx + (p.x - d.x);
+                translateY = d.ty + (p.y - d.y);
+                clampPan();
+                setTransform();
+            }
+        }
+    };
+
+    const endGesture = (e) => {
+        pointers.delete(e.pointerId);
+        wrapper.releasePointerCapture?.(e.pointerId);
+        // Reset gesture snapshots when pointers change
+        wrapper._pinchStart = null;
+        wrapper._dragStart = null;
+
+        // Snap back to 1x if near 1 for usability
+        if (scale < 1.05) {
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        setTransform();
+        } else {
+        setTransform(); // ensure wrapper._scale is updated
+        }
+    };
+    setTransform();
+
+    wrapper.onpointerup = endGesture;
+    wrapper.onpointercancel = endGesture;
+    wrapper.onpointerleave = (e) => {
+        if (pointers.has(e.pointerId)) endGesture(e);
+    };
+
+    // Double-tap to zoom in/out (mobile friendly)
+    let lastTap = 0;
+    wrapper.addEventListener('click', (e) => {
+        const now = Date.now();
+        if (now - lastTap < 300) {
+            // Double tap
+            if (scale === 1) {
+                scale = 2;
+                // Center zoom roughly where tapped
+                const rect = wrapper.getBoundingClientRect();
+                const cx = e.clientX - (rect.left + rect.width / 2);
+                const cy = e.clientY - (rect.top + rect.height / 2);
+                translateX = -cx * 0.5;
+                translateY = -cy * 0.5;
+            } else {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+            }
+            clampPan();
+            setTransform();
+        }
+        lastTap = now;
+    }, { passive: true });
+}
+
+async function renderPage(pageNum) {
+  if (isTransitioning || pageNum === currentPage) return;
+  if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
+  isTransitioning = true;
+
+  if (loading) loading.style.display = 'none';
+
+  // Ensure wrapper exists and image is decoded
+  const nextWrapper = await buildPageWrapper(pageNum);
+
+  // Mount next/prev/current in the DOM (pool of 3)
+  mountPoolAround(pageNum);
+
+  // Activate the new page: cross-fade
+  const prevActive = document.querySelector('.page-image-wrapper.active');
+
+  // Ensure starting state for fade
+  nextWrapper.classList.remove('active'); // in case it was cached active
+  // Force a frame so CSS transitions apply
+  nextWrapper.getBoundingClientRect();
+  nextWrapper.classList.add('active');
+
+  // After the new one is visible, deactivate previous
+  if (prevActive && prevActive !== nextWrapper) {
+    // Wait for the new one to finish its fade-in (~180ms)
+    await new Promise(r => setTimeout(r, 190));
+    prevActive.classList.remove('active');
+  }
+
+  // Update UI state
+  currentPage = pageNum;
+  currentPageEl.textContent = pageNum;
+  prevBtn.disabled = pageNum === 1;
+  nextBtn.disabled = pageNum === TOTAL_PAGES;
+
+  isTransitioning = false;
+}
+(async function init() {
+  await buildPageWrapper(1);
+  await buildPageWrapper(2); // next
+  mountPoolAround(1);
+
+  // Activate page 1 without flash
+  const first = pageDomCache.get(1);
+  viewer.appendChild(first);
+  // Force a frame then activate
+  first.getBoundingClientRect();
+  first.classList.add('active');
+
+  if (loading) loading.style.display = 'none';
+})();
+
+        function goToPage(pageNum) {
+            if (pageNum < 1 || pageNum > TOTAL_PAGES || pageNum === currentPage) return;
+            renderPage(pageNum);
+        }
+
+        function nextPage() {
+            if (currentPage < TOTAL_PAGES) {
+                goToPage(currentPage + 1);
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                goToPage(currentPage - 1);
+            }
+        }
+
+        // Button click handlers
+        prevBtn.addEventListener('click', prevPage);
+        nextBtn.addEventListener('click', nextPage);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevPage();
+            } else if (e.key === 'ArrowRight') {
+                nextPage();
+            }
+        });
+
+        // Prevent pull-to-refresh on mobile
+        document.body.addEventListener('touchmove', (e) => {
+
+        }, { passive: false });
+    </script>
+</body>
+</html>
