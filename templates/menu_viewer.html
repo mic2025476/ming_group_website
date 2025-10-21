@@ -62,6 +62,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            
         }
 
         .page-image-wrapper {
@@ -224,6 +225,7 @@
 
         <!-- Viewer Container -->
         <div class="viewer-container" id="viewer">
+            
             <div class="loading" id="loading">Loading menu...</div>
 
             <!-- Pages will be dynamically loaded here -->
@@ -251,6 +253,9 @@
         const MAX_DOM_PAGES = 3;        // keep prev/current/next in DOM
         const TOTAL_PAGES = 33;
         const BASE_PATH = '{% static "m1/pages" %}';
+let lastNavAt = 0;            // when we last changed page
+const DOUBLE_TAP_BLOCK_MS = 350;
+
 
         let currentPage = 1;
         let isTransitioning = false;
@@ -369,6 +374,14 @@ function enablePinchZoom(wrapper) {
         img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
         wrapper._scale = scale;  
     };
+// expose a reset API so renderPage can force 1x on activation
+wrapper.resetZoom = () => {
+  scale = 1;
+  translateX = 0;
+  translateY = 0;
+  setTransform();
+};
+
     wrapper._scale = 1;
 
     const getDistance = (p1, p2) => Math.hypot(p2.x - p1.x, p2.y - p1.y);
@@ -488,30 +501,6 @@ function enablePinchZoom(wrapper) {
         if (pointers.has(e.pointerId)) endGesture(e);
     };
 
-    // Double-tap to zoom in/out (mobile friendly)
-    let lastTap = 0;
-    wrapper.addEventListener('click', (e) => {
-        const now = Date.now();
-        if (now - lastTap < 300) {
-            // Double tap
-            if (scale === 1) {
-                scale = 2;
-                // Center zoom roughly where tapped
-                const rect = wrapper.getBoundingClientRect();
-                const cx = e.clientX - (rect.left + rect.width / 2);
-                const cy = e.clientY - (rect.top + rect.height / 2);
-                translateX = -cx * 0.5;
-                translateY = -cy * 0.5;
-            } else {
-                scale = 1;
-                translateX = 0;
-                translateY = 0;
-            }
-            clampPan();
-            setTransform();
-        }
-        lastTap = now;
-    }, { passive: true });
 }
 
 async function renderPage(pageNum) {
@@ -529,7 +518,14 @@ async function renderPage(pageNum) {
 
   // Activate the new page: cross-fade
   const prevActive = document.querySelector('.page-image-wrapper.active');
-
+  if (nextWrapper.resetZoom) nextWrapper.resetZoom();
+// make sure the new page always starts at 1x
+if (typeof nextWrapper.resetZoom === 'function') {
+  nextWrapper.resetZoom();
+}
+if (prevActive && prevActive !== nextWrapper && typeof prevActive.resetZoom === 'function') {
+  prevActive.resetZoom();
+}
   // Ensure starting state for fade
   nextWrapper.classList.remove('active'); // in case it was cached active
   // Force a frame so CSS transitions apply
@@ -539,6 +535,7 @@ async function renderPage(pageNum) {
   // After the new one is visible, deactivate previous
   if (prevActive && prevActive !== nextWrapper) {
     // Wait for the new one to finish its fade-in (~180ms)
+    if (prevActive.resetZoom) prevActive.resetZoom();
     await new Promise(r => setTimeout(r, 190));
     prevActive.classList.remove('active');
   }
@@ -566,27 +563,39 @@ async function renderPage(pageNum) {
   if (loading) loading.style.display = 'none';
 })();
 
-        function goToPage(pageNum) {
-            if (pageNum < 1 || pageNum > TOTAL_PAGES || pageNum === currentPage) return;
-            renderPage(pageNum);
-        }
+function goToPage(pageNum) {
+  if (pageNum < 1 || pageNum > TOTAL_PAGES || pageNum === currentPage) return;
+  lastNavAt = Date.now();             // stamp any navigation
+  renderPage(pageNum);
+}
 
-        function nextPage() {
-            if (currentPage < TOTAL_PAGES) {
-                goToPage(currentPage + 1);
-            }
-        }
 
-        function prevPage() {
-            if (currentPage > 1) {
-                goToPage(currentPage - 1);
-            }
-        }
+function nextPage() {
+  const now = Date.now();
+  if (now - lastNavAt < 200 || isTransitioning) return;
+  if (currentPage < TOTAL_PAGES) {
+    lastNavAt = now;
+    goToPage(currentPage + 1);
+  }
+}
+
+function prevPage() {
+  const now = Date.now();
+  if (now - lastNavAt < 200 || isTransitioning) return;
+  if (currentPage > 1) {
+    lastNavAt = now;
+    goToPage(currentPage - 1);
+  }
+}
+
 
         // Button click handlers
         prevBtn.addEventListener('click', prevPage);
         nextBtn.addEventListener('click', nextPage);
-
+['click','pointerdown','pointerup','touchstart','touchend'].forEach(type => {
+  prevBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
+  nextBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
+});
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') {
