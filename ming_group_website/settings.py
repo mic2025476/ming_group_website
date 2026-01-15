@@ -160,3 +160,4 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.ngrok-free.app'
 ]
 
+X_FRAME_OPTIONS = 'ALLOWALL'
