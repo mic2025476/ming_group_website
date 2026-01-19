@@ -23,21 +23,14 @@ body{
   background: url("/static/images/ming_tastic_gallery_6.jpg") center / cover no-repeat fixed;
 }
 
-/* add overlay */
-body::before{
-  content:"";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-}
-
 
 
 /* 👇 IF EMBEDDED IN IFRAME */
-body.is-embedded {
-  background: transparent !important;
-  position: static !important;
-  overflow: hidden;
+body.is-embedded{
+  background: url("/static/images/ming_tastic_gallery_6.jpg") center / cover no-repeat fixed !important;
+  position: fixed !important;
+  inset: 0 !important;
+  overflow: hidden !important;
 }
 
 
@@ -279,6 +272,10 @@ body.is-embedded {
 .page-image-wrapper {
   background: transparent !important;
 }
+
+html, body { height: 100%; }
+.menu-viewer { height: 100%; }
+.viewer-container { height: calc(100% - 60px); } /* 60px header approx */
 
     </style>
 </head>
