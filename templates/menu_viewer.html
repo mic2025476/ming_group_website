@@ -15,12 +15,20 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: white;          /* 👈 outside area (not black) */
+  background: #fff;
   overflow: hidden;
   position: fixed;
   width: 100%;
   height: 100%;
 }
+
+/* 👇 IF EMBEDDED IN IFRAME */
+body.is-embedded {
+  background: transparent !important;
+  position: static !important;
+  overflow: hidden;
+}
+
 
 
 .menu-viewer {
@@ -35,9 +43,10 @@ body {
 
 
         .header {
-            background: rgba(0,0,0,0.9);
-            color: white;
+            background: #fff;   
+            color: #111;
             padding: 15px 20px;
+            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -50,19 +59,22 @@ body {
             font-weight: 600;
         }
 
-        .page-counter {
-            background: rgba(255,255,255,0.1);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
+.page-counter{
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.06);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
 
         .viewer-container {
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: #000;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -139,11 +151,11 @@ body {
             left: 15px;
         }
 .nav-button.prev {
-    left: calc(50% - 300px);   /* 👈 nah an Menü */
+    left: calc(50% - 320px);   /* 👈 nah an Menü */
 }
 
 .nav-button.next {
-    right: calc(50% - 300px);
+    right: calc(50% - 320px);
 }
 
 
@@ -159,7 +171,7 @@ body {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: white;
+            color: #111;
             font-size: 16px;
         }
 
@@ -171,7 +183,7 @@ body {
             color: rgba(255,255,255,0.6);
             font-size: 14px;
             padding: 8px 16px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.06);
             border-radius: 20px;
             animation: fadeOut 3s forwards;
             pointer-events: none;
@@ -212,7 +224,7 @@ body {
 .page-image-wrapper {
     touch-action: none;       /* enables Pointer Events pinch/pan */
     overflow: hidden;         /* hide edges while panning when zoomed */
-    background: #000;
+    background: #fff;
     will-change: opacity; 
 }
 
@@ -628,6 +640,9 @@ function prevPage() {
         document.body.addEventListener('touchmove', (e) => {
 
         }, { passive: false });
+  if (window.self !== window.top) {
+    document.body.classList.add("is-embedded");
+  }
     </script>
 </body>
 </html>
