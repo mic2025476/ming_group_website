@@ -83,12 +83,14 @@ body.is-embedded {
 
 .menu-frame {
     position: relative;
-    width: 100%;
+
     max-width: 900px;   /* 👈 steuert schwarzen Rand */
     height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: min(900px, 100%);
+    margin: 0 auto;
 }
         .page-image-wrapper {
             width: 100%;
@@ -238,6 +240,33 @@ body.is-embedded {
 
 @media (prefers-reduced-motion: reduce) {
   .page-image-wrapper { transition: none; }
+}
+
+/* ===== EMBED SAFE MODE (iframe) ===== */
+body.is-embedded{
+  background: #fff !important;
+  position: fixed !important;   /* keep your viewer stable */
+  inset: 0 !important;          /* full iframe area */
+  overflow: hidden !important;
+}
+
+/* make sure the viewer has a real height */
+.menu-viewer{
+  height: 100% !important;
+}
+
+/* critical: anchor absolute pages correctly */
+.viewer-container{
+  position: relative !important;
+  height: 100% !important;
+  background: #fff !important;
+}
+
+/* the wrappers are absolute, so they need a positioned parent */
+.page-image-wrapper{
+  position: absolute !important;
+  inset: 0 !important;
+  background: #fff !important;
 }
 
     </style>
@@ -640,7 +669,12 @@ function prevPage() {
         document.body.addEventListener('touchmove', (e) => {
 
         }, { passive: false });
-  if (window.self !== window.top) {
+
+  try {
+    if (window.self !== window.top) {
+      document.body.classList.add("is-embedded");
+    }
+  } catch (e) {
     document.body.classList.add("is-embedded");
   }
     </script>
