@@ -28,8 +28,6 @@ body::before{
   content:"";
   position: fixed;
   inset: 0;
-  background: rgba(255,255,255,0.65); /* brighten */
-  backdrop-filter: blur(10px);
   pointer-events: none;
 }
 
@@ -166,11 +164,11 @@ body.is-embedded {
             left: 15px;
         }
 .nav-button.prev {
-    left: calc(50% - 320px);   /* 👈 nah an Menü */
+    left: calc(50% - 310px);   /* 👈 nah an Menü */
 }
 
 .nav-button.next {
-    right: calc(50% - 320px);
+    right: calc(50% - 310px);
 }
 
 
@@ -253,15 +251,6 @@ body.is-embedded {
 
 @media (prefers-reduced-motion: reduce) {
   .page-image-wrapper { transition: none; }
-}
-
-/* ===== EMBED SAFE MODE (iframe) ===== */
-body.is-embedded{
- background: url("https://ming-group.de/static/images/ming_tastic_gallery_6.jpg")
-              center / cover no-repeat fixed !important;
-  position: fixed !important;   /* keep your viewer stable */
-  inset: 0 !important;          /* full iframe area */
-  overflow: hidden !important;
 }
 
 /* make sure the viewer has a real height */
