@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ming Dynastie Menü</title>
+
+  <style>
+    :root{
+      --bg:#f6f4f1;
+      --card:#ffffff;
+      --text:#1f1f1f;
+      --muted:#6b6b6b;
+      --border:rgba(0,0,0,0.08);
+      --shadow:0 10px 30px rgba(0,0,0,0.08);
+      --shadow-hover:0 18px 40px rgba(0,0,0,0.12);
+      --radius:18px;
+      --max:1100px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    body{
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 32px 20px 56px;
+    }
+
+    .page-shell{
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:32px;
+      flex-wrap:wrap;
+    }
+
+    .hero h1{
+      font-size: clamp(28px, 4vw, 42px);
+      line-height:1.1;
+      margin-bottom:10px;
+      letter-spacing:-0.02em;
+    }
+
+    .hero p{
+      color:var(--muted);
+      font-size:16px;
+      max-width:620px;
+      line-height:1.5;
+    }
+
+    .controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:rgba(255,255,255,0.8);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:8px 12px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    .controls label{
+      font-size:14px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .controls select{
+      border:none;
+      background:transparent;
+      font-size:14px;
+      color:var(--text);
+      outline:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .menu-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:20px;
+    }
+
+    .menu-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:22px 22px 20px;
+      box-shadow:var(--shadow);
+      border:1px solid var(--border);
+      text-decoration:none;
+      color:var(--text);
+      transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      display:flex;
+      flex-direction:column;
+      min-height:160px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .menu-card:hover{
+      transform:translateY(-4px);
+      box-shadow:var(--shadow-hover);
+      border-color:rgba(0,0,0,0.12);
+    }
+
+    .menu-card::after{
+      content:"";
+      position:absolute;
+      inset:auto -30px -30px auto;
+      width:110px;
+      height:110px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(0,0,0,0.04), transparent 68%);
+      pointer-events:none;
+    }
+
+    .menu-card__page{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:18px;
+      font-weight:600;
+      letter-spacing:0.02em;
+    }
+
+    .menu-card h3{
+      font-size:22px;
+      line-height:1.2;
+      margin-bottom:8px;
+    }
+
+    .menu-card p{
+      font-size:14px;
+      color:var(--muted);
+      line-height:1.45;
+      margin-bottom:18px;
+    }
+
+    .menu-card__cta{
+      margin-top:auto;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .loading,
+    .error{
+      text-align:center;
+      padding:40px 20px;
+      color:var(--muted);
+      font-size:16px;
+    }
+
+    @media (max-width: 640px){
+      body{
+        padding:24px 14px 40px;
+      }
+
+      .topbar{
+        margin-bottom:24px;
+      }
+
+      .controls{
+        width:100%;
+        justify-content:space-between;
+      }
+
+      .menu-card{
+        min-height:145px;
+        padding:18px;
+      }
+
+      .menu-card h3{
+        font-size:20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <div class="hero">
+        <h1 id="page-title">Speisekarte</h1>
+        <p id="page-subtitle">Wählen Sie eine Kategorie und springen Sie direkt zur passenden Seite.</p>
+      </div>
+
+      <div class="controls">
+        <label for="language-select" id="language-label">Sprache</label>
+        <select id="language-select" aria-label="Sprache auswählen">
+          <option value="de">Deutsch</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="menu-grid" class="menu-grid"></div>
+    <div id="loading" class="loading">Menü wird geladen …</div>
+    <div id="error" class="error" hidden>Die Menüdaten konnten nicht geladen werden.</div>
+  </div>
+
+  <script>
+    const I18N = {
+      de: {
+        pageTitle: "Speisekarte",
+        pageSubtitle: "Wählen Sie eine Kategorie und springen Sie direkt zur passenden Seite.",
+        languageLabel: "Sprache",
+        pagePrefix: "Seite",
+        cta: "Zur Kategorie öffnen"
+      },
+      en: {
+        pageTitle: "Menu",
+        pageSubtitle: "Choose a category and jump directly to the right page.",
+        languageLabel: "Language",
+        pagePrefix: "Page",
+        cta: "Open category"
+      },
+      zh: {
+        pageTitle: "菜单",
+        pageSubtitle: "请选择一个分类，直接跳转到对应页面。",
+        languageLabel: "语言",
+        pagePrefix: "第",
+        cta: "打开分类"
+      }
+    };
+
+    const gridEl = document.getElementById("menu-grid");
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const languageSelect = document.getElementById("language-select");
+
+    const pageTitleEl = document.getElementById("page-title");
+    const pageSubtitleEl = document.getElementById("page-subtitle");
+    const languageLabelEl = document.getElementById("language-label");
+
+    let sections = [];
+    let currentLang = localStorage.getItem("menuIndexLang") || "de";
+
+    function getText(obj, lang, fallback = "de") {
+      if (!obj) return "";
+      return obj[lang] || obj[fallback] || "";
+    }
+
+    function updateStaticTexts() {
+      const t = I18N[currentLang];
+      document.documentElement.lang = currentLang;
+      pageTitleEl.textContent = t.pageTitle;
+      pageSubtitleEl.textContent = t.pageSubtitle;
+      languageLabelEl.textContent = t.languageLabel;
+    }
+
+    function renderCards() {
+      const t = I18N[currentLang];
+      gridEl.innerHTML = "";
+
+      sections.forEach(section => {
+        const label = getText(section.label, currentLang);
+        const subtitle = getText(section.subtitle, currentLang);
+
+        const card = document.createElement("a");
+        card.className = "menu-card";
+        card.href = `/m1/menu/?page=${section.page}`;
+
+        card.innerHTML = `
+          <div class="menu-card__page">
+            ${currentLang === "zh" ? `${t.pagePrefix}${section.page}页` : `${t.pagePrefix} ${section.page}`}
+          </div>
+          <h3>${label}</h3>
+          <p>${subtitle}</p>
+          <div class="menu-card__cta">${t.cta}</div>
+        `;
+
+        gridEl.appendChild(card);
+      });
+    }
+
+    async function loadSections() {
+      try {
+        const response = await fetch("/static/m1/menu_sections.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("Failed to load menu_sections.json");
+
+        sections = await response.json();
+
+        loadingEl.hidden = true;
+        updateStaticTexts();
+        renderCards();
+      } catch (err) {
+        console.error(err);
+        loadingEl.hidden = true;
+        errorEl.hidden = false;
+      }
+    }
+
+    languageSelect.value = currentLang;
+    updateStaticTexts();
+
+    languageSelect.addEventListener("change", () => {
+      currentLang = languageSelect.value;
+      localStorage.setItem("menuIndexLang", currentLang);
+      updateStaticTexts();
+      renderCards();
+    });
+
+    loadSections();
+  </script>
+</body>
+</html>

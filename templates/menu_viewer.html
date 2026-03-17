@@ -1,10 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>M1 Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Josefin+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,95 +16,90 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: 
-    linear-gradient(180deg, rgba(248, 245, 241, 0.96), rgba(248, 245, 241, 0.9)),
-    url("/static/images/bg-texture-white.png") center/cover no-repeat;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
+        html, body {
+            height: 100%;
+        }
 
+        body {
+            font-family: 'Josefin Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                linear-gradient(180deg, rgba(248, 245, 241, 0.96), rgba(248, 245, 241, 0.9)),
+                url("/static/images/bg-texture-white.png") center/cover no-repeat;
+            margin: 0;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
 
+        body.is-embedded {
+            background:
+                linear-gradient(180deg, rgba(248, 245, 241, 0.96), rgba(248, 245, 241, 0.9)),
+                url("/static/images/bg-texture-white.png") center/cover no-repeat !important;
+            position: relative !important;
+            inset: 0 !important;
+            overflow-x: hidden !important;
+        }
 
-
-/* 👇 IF EMBEDDED IN IFRAME */
-body.is-embedded {
-  background:
-    linear-gradient(180deg, rgba(248, 245, 241, 0.96), rgba(248, 245, 241, 0.9)),
-    url("bg-texture-white.png") center/cover no-repeat !important;
-  position: relative !important;
-  inset: 0 !important;
-  overflow-x: hidden !important;
-}
-
-
-
-.menu-viewer {
-  width: min(650px, 100%);   /* 👈 black stage width (reduce black) */
-  height: 100%;
-  margin: 0 auto;            /* 👈 center it */
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background: transparent;          /* 👈 black only here */
-}
-
+        .menu-viewer {
+            width: min(650px, 100%);
+            height: 100%;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+        }
 
         .header {
-            background: transparent;   
+            background: transparent;
             color: #111;
             padding: 15px 20px;
             position: relative;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             z-index: 100;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            min-height: 60px;
         }
 
-        .header h1 {
-            font-size: 20px;
+        .page-counter {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.06);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
+            color: #222;
+            font-family: 'Josefin Sans', sans-serif;
+            letter-spacing: 0.5px;
         }
-
-.page-counter{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.06);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-}
 
         .viewer-container {
             flex: 1;
             position: relative;
             overflow: hidden;
-            background: transparent;
+            background: transparent !important;
             display: flex;
             align-items: center;
             justify-content: center;
-            
+            height: calc(100% - 60px);
         }
 
-.menu-frame {
-    position: relative;
+        .menu-frame {
+            position: relative;
+            max-width: 900px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: min(900px, 100%);
+            margin: 0 auto;
+            background: transparent !important;
+        }
 
-    max-width: 900px;   /* 👈 steuert schwarzen Rand */
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: min(900px, 100%);
-    margin: 0 auto;
-}
         .page-image-wrapper {
             width: 100%;
             height: 100%;
@@ -109,11 +107,14 @@ body.is-embedded {
             align-items: center;
             justify-content: center;
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             opacity: 0;
-            transition: opacity 180ms ease;  /* quick, feels instant */
+            transition: opacity 180ms ease;
             pointer-events: none;
+            touch-action: none;
+            overflow: hidden;
+            background: transparent !important;
+            will-change: opacity;
         }
 
         .page-image-wrapper.active {
@@ -130,13 +131,17 @@ body.is-embedded {
             object-fit: contain;
             user-select: none;
             -webkit-user-select: none;
+            will-change: transform;
+            transform-origin: center center;
+            image-rendering: -webkit-optimize-contrast;
+            backface-visibility: hidden;
         }
 
         .nav-button {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.92);
             border: none;
             width: 50px;
             height: 50px;
@@ -147,7 +152,7 @@ body.is-embedded {
             justify-content: center;
             z-index: 10;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
         .nav-button:active {
@@ -160,23 +165,18 @@ body.is-embedded {
         }
 
         .nav-button.prev {
-            left: 15px;
+            left: calc(50% - 310px);
         }
-.nav-button.prev {
-    left: calc(50% - 310px);   /* 👈 nah an Menü */
-}
 
-.nav-button.next {
-    right: calc(50% - 310px);
-}
-
+        .nav-button.next {
+            right: calc(50% - 310px);
+        }
 
         .nav-button svg {
             width: 24px;
             height: 24px;
             fill: #333;
         }
-
 
         .loading {
             position: absolute;
@@ -185,6 +185,8 @@ body.is-embedded {
             transform: translate(-50%, -50%);
             color: #111;
             font-size: 16px;
+            z-index: 20;
+            font-family: 'Josefin Sans', sans-serif;
         }
 
         .swipe-hint {
@@ -192,7 +194,7 @@ body.is-embedded {
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255,255,255,0.6);
+            color: rgba(0,0,0,0.56);
             font-size: 14px;
             padding: 8px 16px;
             background: rgba(0,0,0,0.06);
@@ -207,12 +209,11 @@ body.is-embedded {
             100% { opacity: 0; }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            .page-image-wrapper { transition: none; }
+        }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 18px;
-            }
-
             .nav-button {
                 width: 44px;
                 height: 44px;
@@ -225,165 +226,423 @@ body.is-embedded {
             .nav-button.next {
                 right: 10px;
             }
-        }
 
-        @media (orientation: landscape) and (max-width: 896px) {
             .header {
                 padding: 10px 15px;
+                min-height: 54px;
+            }
+
+            .viewer-container {
+                height: calc(100% - 54px);
             }
         }
-/* Allow handling gestures inside each page */
-.page-image-wrapper {
-    touch-action: none;       /* enables Pointer Events pinch/pan */
-    overflow: hidden;         /* hide edges while panning when zoomed */
-    background: transparent;
-    will-change: opacity; 
-}
 
-.page-image {
-    will-change: transform;   /* smoother transforms */
-    transform-origin: center center;
-  /* Prevent subpixel shimmer during fade */
-  image-rendering: -webkit-optimize-contrast;
-  backface-visibility: hidden;
-}
+        /* =========================
+           DYNAMIC INDEX PAGE
+           — mirrors a real menu page exactly
+        ========================= */
 
-@media (prefers-reduced-motion: reduce) {
-  .page-image-wrapper { transition: none; }
-}
+        .menu-index-page {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
 
-/* make sure the viewer has a real height */
-.menu-viewer{
-  height: 100% !important;
-}
+        /* Paper: same size/shape as a real menu image */
+        .menu-index-paper {
+            height: 100%;
+            aspect-ratio: 3 / 4.24;
+            max-width: 100%;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background:
+                linear-gradient(rgba(243, 238, 228, 0.97), rgba(243, 238, 228, 0.97)),
+                url("/static/images/ming_pattern.png") center/cover;
+            border-left:  1px solid rgba(80, 68, 52, 0.35);
+            border-right: 1px solid rgba(80, 68, 52, 0.18);
+            box-shadow: 2px 0 8px rgba(0,0,0,0.10), -1px 0 4px rgba(0,0,0,0.05);
+        }
 
-/* critical: anchor absolute pages correctly */
-.viewer-container{
-  position: relative !important;
-  height: 100% !important;
-  background: #fff !important;
-}
+        /* Everything inside paper must sit above background */
+        .menu-index-ink-col,
+        .menu-index-body,
+        .menu-index-footer {
+            position: relative;
+            z-index: 2;
+        }
 
-/* the wrappers are absolute, so they need a positioned parent */
-.page-image-wrapper{
-  position: absolute !important;
-  inset: 0 !important;
-  background: #fff !important;
-}
+        /* ── Ink brush column — absolute, right side, just like real pages ── */
+        .menu-index-ink-col {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 52px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 14px;
+            border-left: 1px solid rgba(80, 68, 52, 0.18);
+            pointer-events: none;
+        }
 
-/* === FINAL BACKGROUND OVERRIDE === */
-.viewer-container,
-.menu-viewer,
-.menu-frame,
-.page-image-wrapper {
-  background: transparent !important;
-}
+        .ink-stroke-svg {
+            width: 40px;
+            height: 260px;
+            opacity: 0.85;
+        }
 
-html, body { height: 100%; }
-.menu-viewer { height: 100%; }
-.viewer-container { height: calc(100% - 60px); } /* 60px header approx */
+        .ink-chars {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-family: serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1410;
+            letter-spacing: 5px;
+            margin-top: 6px;
+            line-height: 1;
+            opacity: 0.88;
+        }
 
+        /* ── Main scrollable content — left of the ink col ── */
+        .menu-index-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 28px 64px 0 32px; /* right padding clears ink col */
+            scrollbar-width: none;
+        }
+        .menu-index-body::-webkit-scrollbar { display: none; }
+
+        /* ── Page title — styled like real menu section headers ── */
+        .menu-index-heading {
+            text-align: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1.5px solid rgba(154, 24, 32, 0.20);
+        }
+
+        /* The big red italic title, matching "Menüs – Menu" style */
+        .menu-index-heading h1 {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            font-style: italic;
+            color: #9a1820;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            text-decoration-color: rgba(154, 24, 32, 0.5);
+        }
+
+        /* Small Chinese subtitle below, like the real pages */
+        .menu-index-heading .sub-zh {
+            display: block;
+            font-family: serif;
+            font-size: 13px;
+            color: #7a6a58;
+            margin-top: 3px;
+            letter-spacing: 2px;
+        }
+
+        /* ── Each category block ── */
+        .menu-index-section {
+            margin-bottom: 12px;
+        }
+
+        /* Category header row */
+        .menu-index-cat {
+            display: flex;
+            align-items: baseline;
+            gap: 7px;
+            padding: 4px 0 3px;
+            border-bottom: 1px solid rgba(154, 24, 32, 0.18);
+            margin-bottom: 2px;
+        }
+
+        .menu-index-cat .cat-zh {
+            font-family: serif;
+            font-size: 12px;
+            color: #9a1820;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .menu-index-cat .cat-de {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            font-style: italic;
+            color: #9a1820;
+            letter-spacing: 0.5px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            text-decoration-color: rgba(154,24,32,0.4);
+        }
+
+        .menu-index-cat .cat-en {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 11px;
+            color: #9a7a5a;
+            font-style: italic;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Each item row — single line, dot leaders ── */
+        .menu-index-row {
+            width: 100%;
+            border: none;
+            background: none;
+            padding: 4px 0;
+            display: flex;
+            align-items: baseline;
+            cursor: pointer;
+            text-align: left;
+            transition: color 0.12s;
+        }
+
+        /* Item label: zh / DE / en stacked vertically */
+        .menu-index-row .row-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .menu-index-row .lbl-zh {
+            font-family: serif;
+            font-size: 10px;
+            color: #9a7a5a;
+            letter-spacing: 0.5px;
+            line-height: 1.5;
+        }
+
+        .menu-index-row .lbl-de {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 13px;
+            color: #1e1a17;
+            font-weight: 600;
+            letter-spacing: 0.1px;
+            line-height: 1.4;
+        }
+
+        .menu-index-row .lbl-en {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 10.5px;
+            color: #8a7a68;
+            font-style: italic;
+            letter-spacing: 0.1px;
+            line-height: 1.4;
+        }
+
+        .menu-index-row .dots {
+            flex: 1;
+            border-bottom: 1px dotted rgba(120, 110, 98, 0.35);
+            margin: 0 5px;
+            align-self: center;
+            min-width: 8px;
+        }
+
+        .menu-index-row:hover .lbl-de { color: #9a1820; }
+        .menu-index-row:hover .lbl-zh { color: #9a1820; }
+
+        .menu-index-empty {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding: 24px 0;
+            font-family: 'Josefin Sans', sans-serif;
+        }
+
+        /* ── Footer — full width, same as real pages ── */
+        .menu-index-footer {
+            flex-shrink: 0;
+            padding: 8px 0 10px;
+            border-top: 1px solid rgba(80,68,52,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .menu-index-footer-zh {
+            font-family: serif;
+            font-size: 14px;
+            color: #9a7a5a;
+        }
+
+        .menu-index-footer-sep {
+            width: 26px;
+            height: 1px;
+            background: rgba(154,24,32,0.28);
+        }
+
+        .menu-index-footer-de {
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: #9a7a5a;
+            font-weight: 600;
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 768px) {
+            .menu-index-page { align-items: stretch; }
+
+            .menu-index-paper {
+                height: auto;
+                aspect-ratio: auto;
+                width: 100%;
+                min-height: 100%;
+                border-left: none;
+                border-right: none;
+            }
+
+            .menu-index-body {
+                padding: 20px 52px 0 20px;
+            }
+
+            .menu-index-ink-col {
+                width: 44px;
+            }
+        }
+
+        /* ── Back button ── */
+        .back-to-index {
+            position: absolute;
+            left: 20px; /* fallback, overridden by JS */
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            padding: 0;
+            margin: 0;
+            font-family: 'Josefin Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #444;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.18s ease;
+        }
+
+        .back-to-index:hover {
+            color: #9a1820;
+        }
+
+        @media (max-width: 768px) {
+            .back-to-index {
+                left: 14px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="menu-viewer">
-        <!-- Header -->
         <div class="header">
+            <button type="button" class="back-to-index" id="back-to-index">Back to Menu</button>
+
             <div class="page-counter">
-                <span id="current-page">1</span> / <span id="total-pages">33</span>
+                <span id="current-page">1</span> / <span id="total-pages">34</span>
             </div>
         </div>
 
-        <!-- Viewer Container -->
-        <div class="viewer-container" id="viewer">
-            
+        <div class="viewer-container">
             <div class="loading" id="loading">Loading menu...</div>
 
-            <!-- Pages will be dynamically loaded here -->
-            <div class="menu-frame">
-                <!-- Pages will be dynamically loaded here -->
-            </div>
-            <!-- Previous Button -->
+            <div class="menu-frame" id="viewer"></div>
+
             <button class="nav-button prev" id="prev-btn" aria-label="Previous page">
                 <svg viewBox="0 0 24 24">
                     <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
                 </svg>
             </button>
 
-            <!-- Next Button -->
             <button class="nav-button next" id="next-btn" aria-label="Next page">
                 <svg viewBox="0 0 24 24">
                     <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                 </svg>
             </button>
-
         </div>
-
     </div>
 
     <script>
-        const pageDomCache = new Map(); // pageNum -> wrapper
-        const MAX_DOM_PAGES = 3;        // keep prev/current/next in DOM
-        const TOTAL_PAGES = 33;
+        const backToIndexBtn = document.getElementById('back-to-index');
+        backToIndexBtn.addEventListener('click', () => {
+            goToPage(2);
+        });
+
+        // Align "Back to Menu" with the left border of the menu paper
+        function alignBackButton() {
+            const paper = document.querySelector('.menu-index-paper');
+            const header = document.querySelector('.header');
+            if (!paper || !header) return;
+            const paperRect = paper.getBoundingClientRect();
+            const headerRect = header.getBoundingClientRect();
+            const left = Math.max(8, paperRect.left - headerRect.left);
+            backToIndexBtn.style.left = left + 'px';
+        }
+
+        window.addEventListener('resize', alignBackButton);
+
+        const TOTAL_PAGES = 34;
         const BASE_PATH = '{% static "m1/pages" %}';
-        
-let lastNavAt = 0;            // when we last changed page
-const DOUBLE_TAP_BLOCK_MS = 350;
+        const MENU_SECTIONS_URL = '/static/m1/menu_sections.json';
 
-
-        let currentPage = 1;
+        const pageDomCache = new Map();
+        const imageCache = {};
+        let imagesLoaded = 0;
         let isTransitioning = false;
+        let lastNavAt = 0;
 
-        const viewer = document.querySelector('.menu-frame');
+        const viewer = document.getElementById('viewer');
         const loading = document.getElementById('loading');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const currentPageEl = document.getElementById('current-page');
+        const totalPagesEl = document.getElementById('total-pages');
 
-        // Preload ALL images upfront for instant viewing
-        const imageCache = {};
-        let imagesLoaded = 0;
-async function buildPageWrapper(pageNum) {
-  if (pageDomCache.has(pageNum)) return pageDomCache.get(pageNum);
+        totalPagesEl.textContent = TOTAL_PAGES;
 
-  const wrapper = createPageElement(pageNum);
-  const img = wrapper.querySelector('.page-image');
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestedPage = parseInt(urlParams.get('page'), 10);
 
-  try {
-    if (img.decode) await img.decode();
-    else await new Promise(r => img.complete ? r() : img.addEventListener('load', r, { once: true }));
-  } catch (_) { /* ignore */ }
+        let currentPage = (!isNaN(requestedPage) && requestedPage >= 1 && requestedPage <= TOTAL_PAGES)
+            ? requestedPage
+            : 1;
 
-  // ❌ REMOVE this; it blocks the fade-in:
-  // wrapper.style.opacity = '0';
+        let menuSections = [];
 
-  // ✅ Attach pinch-zoom once per wrapper
-  if (!wrapper._pzReady) {
-    enablePinchZoom(wrapper);
-    wrapper._pzReady = true;
-  }
-
-  pageDomCache.set(pageNum, wrapper);
-  return wrapper;
-}
-
-function mountPoolAround(pageNum) {
-  const wanted = new Set([pageNum - 1, pageNum, pageNum + 1].filter(n => n >= 1 && n <= TOTAL_PAGES));
-
-  // mount wanted
-  wanted.forEach(n => {
-    const el = pageDomCache.get(n);
-    if (el && !viewer.contains(el)) viewer.appendChild(el);
-  });
-
-  // unmount extras to avoid DOM bloat
-  [...pageDomCache.keys()].forEach(n => {
-    const el = pageDomCache.get(n);
-    if (!wanted.has(n) && el && viewer.contains(el)) {
-      viewer.removeChild(el);
-    }
-  });
-}
+        // All group names in all 3 languages — always shown together
+        const GROUP_LABELS = {
+            menus:        { zh: '套餐',      de: 'Menüs',            en: 'Menus' },
+            lunch:        { zh: '午餐',      de: 'Lunch',            en: 'Lunch' },
+            dimsum:       { zh: '点心',      de: 'Dim Sum',          en: 'Dim Sum' },
+            starters:     { zh: '前菜',      de: 'Vorspeisen',       en: 'Starters' },
+            soups:        { zh: '汤类',      de: 'Suppen',           en: 'Soups' },
+            rice_noodles: { zh: '米饭与面',   de: 'Reis & Nudeln',    en: 'Rice & Noodles' },
+            main:         { zh: '主菜',      de: 'Hauptgerichte',    en: 'Main Dishes' },
+            vegetarian:   { zh: '素食',      de: 'Vegetarisch',      en: 'Vegetarian' },
+            dessert:      { zh: '甜点与配菜', de: 'Dessert & Beilagen', en: 'Dessert & Sides' },
+            drinks:       { zh: '饮品',      de: 'Getränke',         en: 'Drinks' },
+            wine:         { zh: '葡萄酒与烈酒', de: 'Wein & Spirituosen', en: 'Wine & Spirits' },
+            info:         { zh: '信息',      de: 'Info',             en: 'Info' },
+        };
 
         function preloadImage(pageNum) {
             const pageId = String(pageNum).padStart(3, '0');
@@ -392,13 +651,11 @@ function mountPoolAround(pageNum) {
 
             img1x.onload = img2x.onload = () => {
                 imagesLoaded++;
-                if (loading && imagesLoaded === TOTAL_PAGES * 2) {
+                if (loading && imagesLoaded === 33 * 2) {
                     loading.textContent = 'Ready!';
-                    setTimeout(() => {
-                        loading.style.display = 'none';
-                    }, 500);
+                    setTimeout(() => { loading.style.display = 'none'; }, 300);
                 } else if (loading) {
-                    loading.textContent = `Loading menu... ${Math.floor((imagesLoaded / (TOTAL_PAGES * 2)) * 100)}%`;
+                    loading.textContent = `Loading menu... ${Math.floor((imagesLoaded / (33 * 2)) * 100)}%`;
                 }
             };
 
@@ -408,13 +665,156 @@ function mountPoolAround(pageNum) {
             imageCache[pageNum] = { img1x, img2x };
         }
 
-        // Preload ALL pages upfront
-        for (let i = 1; i <= TOTAL_PAGES; i++) {
+        for (let i = 1; i <= 33; i++) {
             preloadImage(i);
         }
 
+        async function loadMenuSections() {
+            if (menuSections.length) return menuSections;
+            const res = await fetch(MENU_SECTIONS_URL, { cache: 'no-store' });
+            if (!res.ok) throw new Error('Failed to load menu_sections.json');
+            menuSections = await res.json();
+            return menuSections;
+        }
+
+        /* Ink brush SVG – mimics the vertical stroke on the menu pages */
+        const INK_SVG = `
+        <svg class="ink-stroke-svg" viewBox="0 0 38 240" xmlns="http://www.w3.org/2000/svg">
+          <filter id="ink-blur">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+          <g filter="url(#ink-blur)">
+            <!-- Main vertical stroke -->
+            <ellipse cx="19" cy="120" rx="13" ry="110" fill="#1a1410" opacity="0.82"/>
+            <!-- Stroke variation — thinner top -->
+            <ellipse cx="20" cy="30" rx="7" ry="25" fill="#1a1410" opacity="0.65"/>
+            <!-- Brush drip at bottom -->
+            <ellipse cx="18" cy="228" rx="9" ry="10" fill="#1a1410" opacity="0.55"/>
+            <ellipse cx="21" cy="236" rx="4" ry="5" fill="#1a1410" opacity="0.35"/>
+            <!-- Texture streaks -->
+            <rect x="14" y="60" width="2" height="80" rx="1" fill="#f3eedc" opacity="0.4"/>
+            <rect x="20" y="90" width="1.5" height="60" rx="1" fill="#f3eedc" opacity="0.3"/>
+          </g>
+        </svg>`;
+
+        function buildIndexMarkup() {
+            const grouped = {};
+            menuSections.forEach(item => {
+                if (!grouped[item.group]) grouped[item.group] = [];
+                grouped[item.group].push(item);
+            });
+
+            const groupOrder = ['menus','lunch','dimsum','starters','soups','rice_noodles','main','vegetarian','dessert','drinks','wine','info'];
+
+            const directGroups = ['menus', 'dimsum', 'drinks'];
+
+            const sectionsHtml = groupOrder.map(groupKey => {
+                const items = grouped[groupKey] || [];
+                if (!items.length) return '';
+
+                const gl = GROUP_LABELS[groupKey] || { zh: groupKey, de: groupKey, en: groupKey };
+
+                if (directGroups.includes(groupKey)) {
+                    const targetPage = items[0].page;
+                    return `
+                        <div class="menu-index-section">
+                            <button class="menu-index-row" data-page="${targetPage}">
+                                <span class="row-label">
+                                    <span class="lbl-zh">${gl.zh}</span>
+                                    <span class="lbl-de">${gl.de}</span>
+                                    <span class="lbl-en">${gl.en}</span>
+                                </span>
+                                <span class="dots"></span>
+                            </button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="menu-index-section">
+                        <div class="menu-index-cat">
+                            <span class="cat-zh">${gl.zh}</span>
+                            <span class="cat-de">${gl.de}</span>
+                            <span class="cat-en">– ${gl.en}</span>
+                        </div>
+                        ${items.map(item => {
+                            const zh = (item.title && item.title.zh) || '';
+                            const de = (item.title && item.title.de) || '';
+                            const en = (item.title && item.title.en) || '';
+                            return `
+                            <button class="menu-index-row" data-page="${item.page}">
+                                <span class="row-label">
+                                    ${zh ? `<span class="lbl-zh">${zh}</span>` : ''}
+                                    <span class="lbl-de">${de}</span>
+                                    ${en ? `<span class="lbl-en">${en}</span>` : ''}
+                                </span>
+                                <span class="dots"></span>
+                            </button>`;
+                        }).join('')}
+                    </div>`;
+            }).join('');
+
+            return `
+                <!-- Ink col — absolute, right side, mirrors real pages exactly -->
+                <div class="menu-index-ink-col">
+                    ${INK_SVG}
+                    <div class="ink-chars">目录</div>
+                </div>
+
+                <!-- Scrollable content -->
+                <div class="menu-index-body">
+                    <div class="menu-index-heading">
+                        <h1>Inhaltsverzeichnis – Contents</h1>
+                        <span class="sub-zh">菜单目录</span>
+                    </div>
+                    ${sectionsHtml}
+                </div>
+
+                <!-- Footer -->
+                <div class="menu-index-footer">
+                    <span class="menu-index-footer-zh">明</span>
+                    <span class="menu-index-footer-sep"></span>
+                    <span class="menu-index-footer-de">Ming 1</span>
+                    <span class="menu-index-footer-sep"></span>
+                    <span class="menu-index-footer-zh">明</span>
+                </div>
+            `;
+        }
+
+        function attachIndexInteractions(pageEl) {
+            pageEl.querySelectorAll('.menu-index-row').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetPage = parseInt(btn.dataset.page, 10);
+                    goToPage(targetPage);
+                });
+            });
+        }
+
+        function createIndexPageElement() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'page-image-wrapper';
+            wrapper.dataset.page = '2';
+
+            const page = document.createElement('div');
+            page.className = 'menu-index-page';
+
+            const paper = document.createElement('div');
+            paper.className = 'menu-index-paper';
+            page.appendChild(paper);
+            wrapper.appendChild(page);
+
+            wrapper.resetZoom = () => {};
+            wrapper._scale = 1;
+
+            return wrapper;
+        }
+
         function createPageElement(pageNum) {
-            const pageId = String(pageNum).padStart(3, '0');
+            if (pageNum === 2) return createIndexPageElement();
+
+            const realPageNum = pageNum === 1 ? 1 : pageNum - 1;
+            const pageId = String(realPageNum).padStart(3, '0');
 
             const wrapper = document.createElement('div');
             wrapper.className = 'page-image-wrapper';
@@ -425,272 +825,263 @@ function mountPoolAround(pageNum) {
             img.src = `${BASE_PATH}/page-${pageId}-1x.webp`;
             img.srcset = `${BASE_PATH}/page-${pageId}-1x.webp 1x, ${BASE_PATH}/page-${pageId}-2x.webp 2x`;
             img.alt = `Menu Page ${pageNum}`;
-            img.loading = pageNum <= 2 ? 'eager' : 'lazy';
+            img.loading = pageNum <= 3 ? 'eager' : 'lazy';
             img.draggable = false;
 
             wrapper.appendChild(img);
             return wrapper;
         }
-function enablePinchZoom(wrapper) {
-    const img = wrapper.querySelector('.page-image');
 
-    // State
-    let scale = 1, minScale = 1, maxScale = 4;
-    let startScale = 1;
-    let translateX = 0, translateY = 0;
-    let startTranslateX = 0, startTranslateY = 0;
+        async function buildPageWrapper(pageNum) {
+            if (pageDomCache.has(pageNum)) return pageDomCache.get(pageNum);
 
-    // Multi-pointer tracking
-    const pointers = new Map();
+            const wrapper = createPageElement(pageNum);
+            const img = wrapper.querySelector('.page-image');
 
-    // Helpers
-    const setTransform = () => {
-        img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-        wrapper._scale = scale;  
-    };
-// expose a reset API so renderPage can force 1x on activation
-wrapper.resetZoom = () => {
-  scale = 1;
-  translateX = 0;
-  translateY = 0;
-  setTransform();
-};
+            if (img) {
+                try {
+                    if (img.decode) {
+                        await img.decode();
+                    } else {
+                        await new Promise(resolve =>
+                            img.complete ? resolve() : img.addEventListener('load', resolve, { once: true })
+                        );
+                    }
+                } catch (_) {}
 
-    wrapper._scale = 1;
-
-    const getDistance = (p1, p2) => Math.hypot(p2.x - p1.x, p2.y - p1.y);
-    const getCenter = (p1, p2) => ({ x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 });
-
-    // Constrain panning so you can't drag the image completely away
-    const clampPan = () => {
-        const rect = wrapper.getBoundingClientRect();
-        const imgRect = img.getBoundingClientRect();
-
-        // Visible half-size of wrapper
-        const halfW = rect.width / 2;
-        const halfH = rect.height / 2;
-
-        // Scaled image half-size
-        const imgHalfW = (img.naturalWidth * scale) / 2 * (rect.height / img.naturalHeight > rect.width / img.naturalWidth ? rect.width / img.naturalWidth : rect.height / img.naturalHeight);
-        const imgHalfH = (img.naturalHeight * scale) / 2 * (rect.height / img.naturalHeight > rect.width / img.naturalWidth ? rect.width / img.naturalWidth : rect.height / img.naturalHeight);
-
-        // When the image is smaller than the wrapper, keep it centered
-        const maxX = Math.max(0, imgHalfW - halfW);
-        const maxY = Math.max(0, imgHalfH - halfH);
-
-        translateX = Math.min(maxX, Math.max(-maxX, translateX));
-        translateY = Math.min(maxY, Math.max(-maxY, translateY));
-    };
-
-    // Pointer Events
-    wrapper.onpointerdown = (e) => {
-        wrapper.setPointerCapture(e.pointerId);
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-        // Cache starting transforms for the gesture
-        startScale = scale;
-        startTranslateX = translateX;
-        startTranslateY = translateY;
-    };
-
-    wrapper.onpointermove = (e) => {
-        if (!pointers.has(e.pointerId)) return;
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-        const pts = [...pointers.values()];
-
-        if (pts.length === 2) {
-            // Pinch zoom
-            const startPts = pts.map(p => p); // current snapshots
-            // We also need the initial positions; simplest approach: store first frame of two-pointer gesture
-            if (!wrapper._pinchStart) {
-                wrapper._pinchStart = {
-                    a: startPts[0],
-                    b: startPts[1],
-                    center: getCenter(startPts[0], startPts[1]),
-                    distance: getDistance(startPts[0], startPts[1]),
-                    scale: scale,
-                    tx: translateX,
-                    ty: translateY
-                };
-                return;
-            }
-
-            const s = wrapper._pinchStart;
-            const newCenter = getCenter(startPts[0], startPts[1]);
-            const newDistance = getDistance(startPts[0], startPts[1]);
-
-            // Scale relative to start of pinch
-            const factor = newDistance / (s.distance || 1);
-            let nextScale = Math.max(minScale, Math.min(maxScale, s.scale * factor));
-
-            // Keep zoom focused around the pinch center by adjusting translation
-            // Compute how much the center moved and compensate.
-            scale = nextScale;
-
-            // Pan by the movement of the center while also compensating for scale change
-            translateX = s.tx + (newCenter.x - s.center.x);
-            translateY = s.ty + (newCenter.y - s.center.y);
-
-            clampPan();
-            setTransform();
-        } else if (pts.length === 1) {
-            // One finger pan when zoomed in
-            if (scale > 1) {
-                const p = pts[0];
-                if (!wrapper._dragStart) {
-                    wrapper._dragStart = { x: p.x, y: p.y, tx: translateX, ty: translateY };
-                    return;
+                if (!wrapper._pzReady) {
+                    enablePinchZoom(wrapper);
+                    wrapper._pzReady = true;
                 }
-                const d = wrapper._dragStart;
-                translateX = d.tx + (p.x - d.x);
-                translateY = d.ty + (p.y - d.y);
-                clampPan();
-                setTransform();
+            } else if (pageNum === 2) {
+                try {
+                    await loadMenuSections();
+                    const page = wrapper.querySelector('.menu-index-page');
+                    const paper = wrapper.querySelector('.menu-index-paper');
+                    paper.innerHTML = buildIndexMarkup();
+                    attachIndexInteractions(page);
+                } catch (err) {
+                    console.error(err);
+                    const paper = wrapper.querySelector('.menu-index-paper');
+                    if (paper) paper.innerHTML = `<div class="menu-index-empty">Index konnte nicht geladen werden.</div>`;
+                }
             }
+
+            pageDomCache.set(pageNum, wrapper);
+            return wrapper;
         }
-    };
 
-    const endGesture = (e) => {
-        pointers.delete(e.pointerId);
-        wrapper.releasePointerCapture?.(e.pointerId);
-        // Reset gesture snapshots when pointers change
-        wrapper._pinchStart = null;
-        wrapper._dragStart = null;
-
-        // Snap back to 1x if near 1 for usability
-        if (scale < 1.05) {
-        scale = 1;
-        translateX = 0;
-        translateY = 0;
-        setTransform();
-        } else {
-        setTransform(); // ensure wrapper._scale is updated
+        function mountPoolAround(pageNum) {
+            const wanted = new Set([pageNum - 1, pageNum, pageNum + 1].filter(n => n >= 1 && n <= TOTAL_PAGES));
+            wanted.forEach(n => {
+                const el = pageDomCache.get(n);
+                if (el && !viewer.contains(el)) viewer.appendChild(el);
+            });
+            [...pageDomCache.keys()].forEach(n => {
+                const el = pageDomCache.get(n);
+                if (!wanted.has(n) && el && viewer.contains(el)) viewer.removeChild(el);
+            });
         }
-    };
-    setTransform();
 
-    wrapper.onpointerup = endGesture;
-    wrapper.onpointercancel = endGesture;
-    wrapper.onpointerleave = (e) => {
-        if (pointers.has(e.pointerId)) endGesture(e);
-    };
+        function enablePinchZoom(wrapper) {
+            const img = wrapper.querySelector('.page-image');
+            if (!img) return;
 
-}
+            let scale = 1, minScale = 1, maxScale = 4;
+            let translateX = 0, translateY = 0;
+            const pointers = new Map();
 
-async function renderPage(pageNum) {
-  if (isTransitioning || pageNum === currentPage) return;
-  if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
-  isTransitioning = true;
+            const setTransform = () => {
+                img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                wrapper._scale = scale;
+            };
 
-  if (loading) loading.style.display = 'none';
+            wrapper.resetZoom = () => {
+                scale = 1;
+                translateX = 0;
+                translateY = 0;
+                setTransform();
+            };
 
-  // Ensure wrapper exists and image is decoded
-  const nextWrapper = await buildPageWrapper(pageNum);
+            wrapper._scale = 1;
 
-  // Mount next/prev/current in the DOM (pool of 3)
-  mountPoolAround(pageNum);
+            const getDistance = (p1, p2) => Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            const getCenter = (p1, p2) => ({ x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 });
 
-  // Activate the new page: cross-fade
-  const prevActive = document.querySelector('.page-image-wrapper.active');
-  if (nextWrapper.resetZoom) nextWrapper.resetZoom();
-// make sure the new page always starts at 1x
-if (typeof nextWrapper.resetZoom === 'function') {
-  nextWrapper.resetZoom();
-}
-if (prevActive && prevActive !== nextWrapper && typeof prevActive.resetZoom === 'function') {
-  prevActive.resetZoom();
-}
-  // Ensure starting state for fade
-  nextWrapper.classList.remove('active'); // in case it was cached active
-  // Force a frame so CSS transitions apply
-  nextWrapper.getBoundingClientRect();
-  nextWrapper.classList.add('active');
+            const clampPan = () => {
+                const rect = wrapper.getBoundingClientRect();
+                const imgHalfW = (img.naturalWidth * scale) / 2 *
+                    (rect.height / img.naturalHeight > rect.width / img.naturalWidth
+                        ? rect.width / img.naturalWidth
+                        : rect.height / img.naturalHeight);
+                const imgHalfH = (img.naturalHeight * scale) / 2 *
+                    (rect.height / img.naturalHeight > rect.width / img.naturalWidth
+                        ? rect.width / img.naturalWidth
+                        : rect.height / img.naturalHeight);
+                const maxX = Math.max(0, imgHalfW - rect.width / 2);
+                const maxY = Math.max(0, imgHalfH - rect.height / 2);
+                translateX = Math.min(maxX, Math.max(-maxX, translateX));
+                translateY = Math.min(maxY, Math.max(-maxY, translateY));
+            };
 
-  // After the new one is visible, deactivate previous
-  if (prevActive && prevActive !== nextWrapper) {
-    // Wait for the new one to finish its fade-in (~180ms)
-    if (prevActive.resetZoom) prevActive.resetZoom();
-    await new Promise(r => setTimeout(r, 190));
-    prevActive.classList.remove('active');
-  }
+            wrapper.onpointerdown = (e) => {
+                wrapper.setPointerCapture(e.pointerId);
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+            };
 
-  // Update UI state
-  currentPage = pageNum;
-  currentPageEl.textContent = pageNum;
-  prevBtn.disabled = pageNum === 1;
-  nextBtn.disabled = pageNum === TOTAL_PAGES;
+            wrapper.onpointermove = (e) => {
+                if (!pointers.has(e.pointerId)) return;
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                const pts = [...pointers.values()];
+                if (pts.length === 2) {
+                    if (!wrapper._pinchStart) {
+                        wrapper._pinchStart = {
+                            a: pts[0], b: pts[1],
+                            center: getCenter(pts[0], pts[1]),
+                            distance: getDistance(pts[0], pts[1]),
+                            scale, tx: translateX, ty: translateY
+                        };
+                        return;
+                    }
+                    const s = wrapper._pinchStart;
+                    const newCenter = getCenter(pts[0], pts[1]);
+                    const newDistance = getDistance(pts[0], pts[1]);
+                    const factor = newDistance / (s.distance || 1);
+                    scale = Math.max(minScale, Math.min(maxScale, s.scale * factor));
+                    translateX = s.tx + (newCenter.x - s.center.x);
+                    translateY = s.ty + (newCenter.y - s.center.y);
+                    clampPan();
+                    setTransform();
+                } else if (pts.length === 1 && scale > 1) {
+                    if (!wrapper._dragStart) {
+                        wrapper._dragStart = { x: pts[0].x, y: pts[0].y, tx: translateX, ty: translateY };
+                        return;
+                    }
+                    const d = wrapper._dragStart;
+                    translateX = d.tx + (pts[0].x - d.x);
+                    translateY = d.ty + (pts[0].y - d.y);
+                    clampPan();
+                    setTransform();
+                }
+            };
 
-  isTransitioning = false;
-}
-(async function init() {
-  await buildPageWrapper(1);
-  await buildPageWrapper(2); // next
-  mountPoolAround(1);
+            const endGesture = (e) => {
+                pointers.delete(e.pointerId);
+                wrapper.releasePointerCapture?.(e.pointerId);
+                wrapper._pinchStart = null;
+                wrapper._dragStart = null;
+                if (scale < 1.05) { scale = 1; translateX = 0; translateY = 0; }
+                setTransform();
+            };
 
-  // Activate page 1 without flash
-  const first = pageDomCache.get(1);
-  viewer.appendChild(first);
-  // Force a frame then activate
-  first.getBoundingClientRect();
-  first.classList.add('active');
+            setTransform();
+            wrapper.onpointerup = endGesture;
+            wrapper.onpointercancel = endGesture;
+            wrapper.onpointerleave = (e) => { if (pointers.has(e.pointerId)) endGesture(e); };
+        }
 
-  if (loading) loading.style.display = 'none';
-})();
+        async function renderPage(pageNum) {
+            if (isTransitioning || pageNum === currentPage) return;
+            if (pageNum < 1 || pageNum > TOTAL_PAGES) return;
 
-function goToPage(pageNum) {
-  if (pageNum < 1 || pageNum > TOTAL_PAGES || pageNum === currentPage) return;
-  lastNavAt = Date.now();             // stamp any navigation
-  renderPage(pageNum);
-}
+            isTransitioning = true;
+            if (loading) loading.style.display = 'none';
 
+            const nextWrapper = await buildPageWrapper(pageNum);
+            mountPoolAround(pageNum);
 
-function nextPage() {
-  const now = Date.now();
-  if (now - lastNavAt < 200 || isTransitioning) return;
-  if (currentPage < TOTAL_PAGES) {
-    lastNavAt = now;
-    goToPage(currentPage + 1);
-  }
-}
+            const prevActive = document.querySelector('.page-image-wrapper.active');
 
-function prevPage() {
-  const now = Date.now();
-  if (now - lastNavAt < 200 || isTransitioning) return;
-  if (currentPage > 1) {
-    lastNavAt = now;
-    goToPage(currentPage - 1);
-  }
-}
+            if (typeof nextWrapper.resetZoom === 'function') nextWrapper.resetZoom();
+            if (prevActive && prevActive !== nextWrapper && typeof prevActive.resetZoom === 'function') prevActive.resetZoom();
 
+            nextWrapper.classList.remove('active');
+            nextWrapper.getBoundingClientRect();
+            nextWrapper.classList.add('active');
 
-        // Button click handlers
+            if (prevActive && prevActive !== nextWrapper) {
+                await new Promise(resolve => setTimeout(resolve, 190));
+                prevActive.classList.remove('active');
+            }
+
+            currentPage = pageNum;
+            currentPageEl.textContent = pageNum;
+            prevBtn.disabled = pageNum === 1;
+            nextBtn.disabled = pageNum === TOTAL_PAGES;
+
+            // Re-align back button whenever we land on the index page
+            if (pageNum === 2) requestAnimationFrame(() => requestAnimationFrame(alignBackButton));
+
+            isTransitioning = false;
+        }
+
+        function goToPage(pageNum) {
+            if (pageNum < 1 || pageNum > TOTAL_PAGES || pageNum === currentPage) return;
+            lastNavAt = Date.now();
+            history.replaceState(null, '', `?page=${pageNum}`);
+            renderPage(pageNum);
+        }
+
+        function nextPage() {
+            const now = Date.now();
+            if (now - lastNavAt < 200 || isTransitioning) return;
+            if (currentPage < TOTAL_PAGES) { lastNavAt = now; goToPage(currentPage + 1); }
+        }
+
+        function prevPage() {
+            const now = Date.now();
+            if (now - lastNavAt < 200 || isTransitioning) return;
+            if (currentPage > 1) { lastNavAt = now; goToPage(currentPage - 1); }
+        }
+
         prevBtn.addEventListener('click', prevPage);
         nextBtn.addEventListener('click', nextPage);
-['click','pointerdown','pointerup','touchstart','touchend'].forEach(type => {
-  prevBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
-  nextBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
-});
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                prevPage();
-            } else if (e.key === 'ArrowRight') {
-                nextPage();
-            }
+
+        ['click', 'pointerdown', 'pointerup', 'touchstart', 'touchend'].forEach(type => {
+            prevBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
+            nextBtn.addEventListener(type, e => e.stopPropagation(), { passive: true });
         });
 
-        // Prevent pull-to-refresh on mobile
-        document.body.addEventListener('touchmove', (e) => {
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') prevPage();
+            if (e.key === 'ArrowRight') nextPage();
+        });
 
-        }, { passive: false });
+        document.body.addEventListener('touchmove', () => {}, { passive: false });
 
-  try {
-    if (window.self !== window.top) {
-      document.body.classList.add("is-embedded");
-    }
-  } catch (e) {
-    document.body.classList.add("is-embedded");
-  }
+        try {
+            if (window.self !== window.top) document.body.classList.add('is-embedded');
+        } catch (e) {
+            document.body.classList.add('is-embedded');
+        }
+
+        (async function init() {
+            // Fetch section data eagerly — must complete before any page 2 build
+            await loadMenuSections().catch(() => {});
+
+            // Build current page AND index page in parallel — both ready before user can interact
+            await Promise.all([
+                buildPageWrapper(currentPage),
+                buildPageWrapper(2),
+                currentPage < TOTAL_PAGES ? buildPageWrapper(currentPage + 1) : Promise.resolve()
+            ]);
+
+            mountPoolAround(currentPage);
+
+            const first = pageDomCache.get(currentPage);
+            currentPageEl.textContent = currentPage;
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === TOTAL_PAGES;
+
+            if (!viewer.contains(first)) viewer.appendChild(first);
+            first.getBoundingClientRect();
+            first.classList.add('active');
+
+            if (loading) loading.style.display = 'none';
+
+            // Align back button to paper left edge once layout is settled
+            requestAnimationFrame(() => requestAnimationFrame(alignBackButton));
+        })();
     </script>
 </body>
 </html>
