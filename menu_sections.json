@@ -1,0 +1,119 @@
+[
+  {
+    "page": 4,
+    "label": {
+      "de": "Vorspeisen",
+      "en": "Starters",
+      "zh": "前菜"
+    },
+    "subtitle": {
+      "de": "Zum Anfang",
+      "en": "To begin with",
+      "zh": "开胃前菜"
+    }
+  },
+  {
+    "page": 5,
+    "label": {
+      "de": "Suppen",
+      "en": "Soups",
+      "zh": "汤类"
+    },
+    "subtitle": {
+      "de": "Warme Klassiker",
+      "en": "Warm classics",
+      "zh": "暖胃汤品"
+    }
+  },
+  {
+    "page": 10,
+    "label": {
+      "de": "Dim Sum",
+      "en": "Chinese Dumplings",
+      "zh": "点心"
+    },
+    "subtitle": {
+      "de": "Kleine Spezialitäten",
+      "en": "Small specialties",
+      "zh": "精致小点"
+    }
+  },
+  {
+    "page": 15,
+    "label": {
+      "de": "Huhn",
+      "en": "Chicken Dishes",
+      "zh": "鸡肉类"
+    },
+    "subtitle": {
+      "de": "Beliebte Gerichte",
+      "en": "Popular dishes",
+      "zh": "热门鸡肉料理"
+    }
+  },
+  {
+    "page": 16,
+    "label": {
+      "de": "Ente",
+      "en": "Duck Dishes",
+      "zh": "鸭肉类"
+    },
+    "subtitle": {
+      "de": "Knusprig & fein",
+      "en": "Crispy & refined",
+      "zh": "香酥鸭料理"
+    }
+  },
+  {
+    "page": 19,
+    "label": {
+      "de": "Meeresfrüchte",
+      "en": "Seafood",
+      "zh": "海鲜类"
+    },
+    "subtitle": {
+      "de": "Aus dem Meer",
+      "en": "From the sea",
+      "zh": "海鲜精选"
+    }
+  },
+  {
+    "page": 20,
+    "label": {
+      "de": "Vegetarisch",
+      "en": "Vegetarian",
+      "zh": "素食类"
+    },
+    "subtitle": {
+      "de": "Frisch & leicht",
+      "en": "Fresh & light",
+      "zh": "清新素食"
+    }
+  },
+  {
+    "page": 24,
+    "label": {
+      "de": "Getränke",
+      "en": "Drinks",
+      "zh": "饮品"
+    },
+    "subtitle": {
+      "de": "Kalt & warm",
+      "en": "Cold & warm",
+      "zh": "冷热饮品"
+    }
+  },
+  {
+    "page": 31,
+    "label": {
+      "de": "Weine",
+      "en": "Wine",
+      "zh": "葡萄酒"
+    },
+    "subtitle": {
+      "de": "Passend zum Essen",
+      "en": "Perfect with food",
+      "zh": "佐餐美酒"
+    }
+  }
+]
