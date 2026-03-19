@@ -1,0 +1,65 @@
+[
+  {
+    "group": "menus",
+    "page": 6,
+    "title": {
+      "de": "Menüs",
+      "en": "Menus",
+      "zh": "套餐"
+    }
+  },
+  {
+    "group": "dimsum",
+    "page": 11,
+    "title": {
+      "de": "Dim Sum",
+      "en": "Dim Sum",
+      "zh": "点心"
+    }
+  },
+  {
+    "group": "main",
+    "page": 16,
+    "title": {
+      "de": "Huhn",
+      "en": "Chicken Dishes",
+      "zh": "鸡肉类"
+    }
+  },
+  {
+    "group": "main",
+    "page": 17,
+    "title": {
+      "de": "Ente",
+      "en": "Duck Dishes",
+      "zh": "鸭肉类"
+    }
+  },
+  {
+    "group": "main",
+    "page": 18,
+    "title": {
+      "de": "Schwein",
+      "en": "Pork Dishes",
+      "zh": "猪肉类"
+    }
+  },
+  {
+    "group": "main",
+    "page": 19,
+    "title": {
+      "de": "Lamm & Rind",
+      "en": "Lamb & Beef",
+      "zh": "牛羊肉类"
+    }
+  },
+  {
+    "group": "drinks",
+    "page": 26,
+    "title": {
+      "de": "Getränke",
+      "en": "Drinks",
+      "zh": "饮品"
+    }
+  }
+]

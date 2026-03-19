@@ -278,47 +278,16 @@
             z-index: 2;
         }
 
-        /* ── Ink brush column — absolute, right side, just like real pages ── */
-        .menu-index-ink-col {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 52px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 14px;
-            border-left: 1px solid rgba(80, 68, 52, 0.18);
-            pointer-events: none;
-        }
+        /* ── Ink brush column — REMOVED per boss ── */
+        .menu-index-ink-col { display: none; }
 
-        .ink-stroke-svg {
-            width: 40px;
-            height: 260px;
-            opacity: 0.85;
-        }
-
-        .ink-chars {
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            font-family: serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: #1a1410;
-            letter-spacing: 5px;
-            margin-top: 6px;
-            line-height: 1;
-            opacity: 0.88;
-        }
-
-        /* ── Main scrollable content — left of the ink col ── */
+        /* ── Main scrollable content — full width now, no ink col ── */
         .menu-index-body {
             flex: 1;
             min-height: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 28px 64px 0 32px; /* right padding clears ink col */
+            padding: 28px 36px 0 36px;
             scrollbar-width: none;
         }
         .menu-index-body::-webkit-scrollbar { display: none; }
@@ -511,11 +480,7 @@
             }
 
             .menu-index-body {
-                padding: 20px 52px 0 20px;
-            }
-
-            .menu-index-ink-col {
-                width: 44px;
+                padding: 20px 24px 0 24px;
             }
         }
 
@@ -642,6 +607,7 @@
             drinks:       { zh: '饮品',      de: 'Getränke',         en: 'Drinks' },
             wine:         { zh: '葡萄酒与烈酒', de: 'Wein & Spirituosen', en: 'Wine & Spirits' },
             info:         { zh: '信息',      de: 'Info',             en: 'Info' },
+            allergens:    { zh: '过敏原',    de: 'Allergene',        en: 'Allergens' },
         };
 
         function preloadImage(pageNum) {
@@ -705,8 +671,14 @@
                 grouped[item.group].push(item);
             });
 
-            const groupOrder = ['menus','lunch','dimsum','starters','soups','rice_noodles','main','vegetarian','dessert','drinks','wine','info'];
+            const groupOrder = ['menus','lunch','dimsum','starters','soups','rice_noodles','main','vegetarian','dessert','drinks','wine','allergens','info'];
 
+            // Always ensure allergens appears at page 4 even if not in JSON
+            if (!grouped['allergens']) {
+                grouped['allergens'] = [{ page: 4, group: 'allergens', title: { zh: '过敏原', de: 'Allergene', en: 'Allergens' } }];
+            }
+
+            // These groups link directly — no sub-items shown, just the category itself
             const directGroups = ['menus', 'dimsum', 'drinks'];
 
             const sectionsHtml = groupOrder.map(groupKey => {
@@ -715,11 +687,12 @@
 
                 const gl = GROUP_LABELS[groupKey] || { zh: groupKey, de: groupKey, en: groupKey };
 
+                // Direct groups: one clickable row for the whole category
                 if (directGroups.includes(groupKey)) {
                     const targetPage = items[0].page;
                     return `
                         <div class="menu-index-section">
-                            <button class="menu-index-row" data-page="${targetPage}">
+                            <button class="menu-index-row menu-index-row--direct" data-page="${targetPage}">
                                 <span class="row-label">
                                     <span class="lbl-zh">${gl.zh}</span>
                                     <span class="lbl-de">${gl.de}</span>
@@ -727,10 +700,26 @@
                                 </span>
                                 <span class="dots"></span>
                             </button>
-                        </div>
-                    `;
+                        </div>`;
                 }
 
+                // allergens — hardcoded to page 4
+                if (groupKey === 'allergens') {
+                    const targetPage = (items.length && items[0].page) ? items[0].page : 4;
+                    return `
+                        <div class="menu-index-section">
+                            <button class="menu-index-row menu-index-row--direct" data-page="${targetPage}">
+                                <span class="row-label">
+                                    <span class="lbl-zh">过敏原</span>
+                                    <span class="lbl-de">Allergene</span>
+                                    <span class="lbl-en">Allergens</span>
+                                </span>
+                                <span class="dots"></span>
+                            </button>
+                        </div>`;
+                }
+
+                // Normal groups: show category header + sub-items
                 return `
                     <div class="menu-index-section">
                         <div class="menu-index-cat">
@@ -756,16 +745,10 @@
             }).join('');
 
             return `
-                <!-- Ink col — absolute, right side, mirrors real pages exactly -->
-                <div class="menu-index-ink-col">
-                    ${INK_SVG}
-                    <div class="ink-chars">目录</div>
-                </div>
-
                 <!-- Scrollable content -->
                 <div class="menu-index-body">
                     <div class="menu-index-heading">
-                        <h1>Inhaltsverzeichnis – Contents</h1>
+                        <h1>Inhaltsverzeichnis – Table of Contents</h1>
                         <span class="sub-zh">菜单目录</span>
                     </div>
                     ${sectionsHtml}
